@@ -5,12 +5,10 @@ import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
-import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
-import org.apache.commons.lang.RandomStringUtils
 import java.util.*
 
 /**
@@ -71,13 +69,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     return PlayerInfoData(
                         GameProfile(
                             UUID.randomUUID(),
-                            RandomStringUtils.randomAlphabetic(16)
+                            "${text}_Z"
                         ),
                         i,
                         WorldSettings.EnumGamemode.SURVIVAL,
-                        ChatComponentText(
-                            "${text}_Z"
-                        )
+                        null
                     )
                 }
 
