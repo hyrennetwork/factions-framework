@@ -22,12 +22,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 ) {
                     val packet = event.packet
 
-                    println("opa")
-
-                    println(packet)
-
                     if (packet is PacketPlayOutPlayerInfo) {
-                        println("daleee")
+                        println(packet)
                     }
                 }
 
