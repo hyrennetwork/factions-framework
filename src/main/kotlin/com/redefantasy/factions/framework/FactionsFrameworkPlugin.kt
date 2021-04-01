@@ -5,7 +5,9 @@ import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
+import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.apache.commons.lang.RandomStringUtils
 import java.util.*
@@ -27,20 +29,28 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo) {
-                        for (i in 0 until 5) {
-                            val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
-                                GameProfile(
-                                    UUID.randomUUID(),
-                                    RandomStringUtils.randomAlphabetic(9)
-                                ),
-                                0,
-                                WorldSettings.EnumGamemode.SURVIVAL,
-                                null
-                            )
+                        val players = packet.b
 
-                            packet.b.add(playerInfoData)
-                        }
+                        players[0] = this.createPlayerInfoDataFromText(
+                            "§e§lMINHA FACÇÃO"
+                        )
                     }
+                }
+
+                private fun createPlayerInfoDataFromText(text: String): PlayerInfoData {
+                    if (text.length > 16) throw IllegalArgumentException("text length is higher than 16!")
+
+                    return PlayerInfoData(
+                        GameProfile(
+                            UUID.randomUUID(),
+                            RandomStringUtils.randomAlphabetic(16)
+                        ),
+                        0,
+                        WorldSettings.EnumGamemode.SURVIVAL,
+                        ChatComponentText(
+                            text
+                        )
+                    )
                 }
 
             }
