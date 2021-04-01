@@ -5,8 +5,10 @@ import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
+import com.redefantasy.factions.framework.misc.utils._HiddenString
 import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.apache.commons.lang.RandomStringUtils
@@ -16,6 +18,8 @@ import java.util.*
  * @author Gutyerrez
  */
 class FactionsFrameworkPlugin : CustomPlugin(false) {
+
+    val RANDOM = Random()
 
     override fun onEnable() {
         super.onEnable()
@@ -31,9 +35,32 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     if (packet is PacketPlayOutPlayerInfo) {
                         val players = packet.b
 
-                        players[0] = this.createPlayerInfoDataFromText(
-                            "§e§lMINHA FACÇÃO"
-                        )
+                        when (packet.a) {
+                            EnumPlayerInfoAction.ADD_PLAYER -> {
+                                players[0] = this.createPlayerInfoDataFromText(
+                                    "§e§lMINHA FACÇÃO"
+                                )
+                                players[1] = this.createPlayerInfoDataFromText(
+                                    "§e[STF] STAFF"
+                                )
+                                players[2] = this.createPlayerInfoDataFromText(
+                                    "§0"
+                                )
+                                players[3] = this.createPlayerInfoDataFromText(
+                                    "§6[Master] Gutyerrez"
+                                )
+
+                                for (i in 4 until 19) {
+                                    players[3] = this.createPlayerInfoDataFromText(
+                                        _HiddenString.generate(10)
+                                    )
+                                }
+                            }
+                            EnumPlayerInfoAction.REMOVE_PLAYER -> {
+                                println("Remover")
+                            }
+                        }
+
                     }
                 }
 
