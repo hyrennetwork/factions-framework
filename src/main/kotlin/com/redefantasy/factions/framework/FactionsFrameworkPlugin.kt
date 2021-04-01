@@ -1,5 +1,6 @@
 package com.redefantasy.factions.framework
 
+import com.google.common.collect.Lists
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
@@ -33,7 +34,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo) {
-                        val players = packet.b
+                        val players = Lists.newArrayListWithCapacity<PlayerInfoData>(80)
 
                         when (packet.a) {
                             EnumPlayerInfoAction.ADD_PLAYER -> {
@@ -61,6 +62,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             }
                         }
 
+                        packet.b.clear()
+                        packet.b.addAll(players)
                     }
                 }
 
