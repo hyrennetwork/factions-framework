@@ -60,7 +60,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             val newPacket = PacketPlayOutPlayerInfo()
 
-                            newPacket.a = packet.a
                             newPacket.b.addAll(players)
 
                             player.sendPacket(newPacket)
