@@ -33,11 +33,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            val players = MutableList(80) {
-                                this.createPlayerInfoDataFromText(
-                                    "§0"
-                                )
-                            }
+                            val players = mutableMapOf<Int, PlayerInfoData>()
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
@@ -50,6 +46,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                     players[2] = this.createPlayerInfoDataFromText(
                                         "§6[Master] Gutyerrez"
                                     )
+
+                                    for (i in 3 until 80) {
+                                        players[i] = this.createPlayerInfoDataFromText(
+                                            "§0"
+                                        )
+                                    }
                                 }
                                 EnumPlayerInfoAction.REMOVE_PLAYER -> {
                                     println("Remover")
@@ -57,7 +59,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             }
 
                             packet.b.clear()
-                            packet.b.addAll(players)
+                            packet.b.addAll(players.values)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
