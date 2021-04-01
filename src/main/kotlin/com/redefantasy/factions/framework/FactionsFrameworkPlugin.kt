@@ -4,7 +4,6 @@ import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
-import com.redefantasy.core.spigot.misc.utils.ProtocolHandler
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 
 /**
@@ -28,6 +27,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     if (packet is PacketPlayOutPlayerInfo) {
                         println("daleee")
                     }
+                }
+
+                override fun onReceive(
+                    event: PacketEvent
+                ) {
+                    println("Recebi")
                 }
 
             }
