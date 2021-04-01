@@ -27,17 +27,17 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo) {
-                        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
-                            GameProfile(
-                                UUID.randomUUID(),
-                                RandomStringUtils.random(9)
-                            ),
-                            0,
-                            WorldSettings.EnumGamemode.SURVIVAL,
-                            null
-                        )
-
                         for (i in 0 until 10) {
+                            val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
+                                GameProfile(
+                                    UUID.randomUUID(),
+                                    RandomStringUtils.random(9)
+                                ),
+                                0,
+                                WorldSettings.EnumGamemode.SURVIVAL,
+                                null
+                            )
+
                             packet.b.add(playerInfoData)
                         }
                     }
