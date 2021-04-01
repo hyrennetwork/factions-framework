@@ -41,20 +41,14 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
-                                    players.add(
-                                        this.createPlayerInfoDataFromText(
-                                            "§e§lMINHA FACÇÃO"
-                                        )
+                                    players[0] = this.createPlayerInfoDataFromText(
+                                        "§e§lMINHA FACÇÃO"
                                     )
-                                    players.add(
-                                        this.createPlayerInfoDataFromText(
-                                            "§e[STF] STAFF"
-                                        )
+                                    players[1] = this.createPlayerInfoDataFromText(
+                                        "§e[STF] STAFF"
                                     )
-                                    players.add(
-                                        this.createPlayerInfoDataFromText(
-                                            "§6[Master] Gutyerrez"
-                                        )
+                                    players[2] = this.createPlayerInfoDataFromText(
+                                        "§6[Master] Gutyerrez"
                                     )
                                 }
                                 EnumPlayerInfoAction.REMOVE_PLAYER -> {
