@@ -27,11 +27,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo) {
-                        for (i in 0 until 10) {
+                        for (i in 0 until 5) {
                             val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
                                 GameProfile(
                                     UUID.randomUUID(),
-                                    RandomStringUtils.random(9)
+                                    RandomStringUtils.randomAlphabetic(9)
                                 ),
                                 0,
                                 WorldSettings.EnumGamemode.SURVIVAL,
