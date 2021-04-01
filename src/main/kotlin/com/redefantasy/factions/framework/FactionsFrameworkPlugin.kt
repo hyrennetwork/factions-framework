@@ -33,30 +33,30 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            val players = MutableList(160) {
-                                this.createPlayerInfoDataFromText(
-                                    "§0"
-                                )
+//                            val players = MutableList(160) {
+//                                this.createPlayerInfoDataFromText(
+//                                    "§0"
+//                                )
+//                            }
+                            for (i in 0 until 160) {
+                                packet.b.add(i, this.createPlayerInfoDataFromText("§0"))
                             }
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
-                                    players[0] = this.createPlayerInfoDataFromText(
-                                        "§e§lMINHA FACÇÃO",
-                                        0
+                                    packet.b[0] = this.createPlayerInfoDataFromText(
+                                        "§e§lMINHA FACÇÃO"
                                     )
-                                    players[1] = this.createPlayerInfoDataFromText(
-                                        "§e[STF] STAFF",
-                                        1
+                                    packet.b[1] = this.createPlayerInfoDataFromText(
+                                        "§e[STF] STAFF"
                                     )
-                                    players[2] = this.createPlayerInfoDataFromText(
-                                        "§6[Master] Gutyerrez",
-                                        2
+                                    packet.b[2] = this.createPlayerInfoDataFromText(
+                                        "§6[Master] Gutyerrez"
                                     )
                                 }
                             }
 
-                            packet.b = players
+//                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -71,17 +71,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     return PlayerInfoData(
                         GameProfile(
                             UUID.randomUUID(),
-                            "${RandomStringUtils.randomAlphabetic(10)}_${i.toAlphabet()}"
+                            RandomStringUtils.randomAlphabetic(16)
                         ),
                         i,
                         WorldSettings.EnumGamemode.SURVIVAL,
                         ChatComponentText(text)
                     )
-                }
-
-                private fun Int.toAlphabet(): String = when {
-                    this == 1 -> "A"
-                    else -> "Z"
                 }
 
             }
