@@ -56,9 +56,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 }
                             }
 
-                            packet.b = players.sortedWith { o1, o2 ->
-                                players.indexOf(o2).compareTo(players.indexOf(o1))
-                            }
+                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -78,7 +76,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         i,
                         WorldSettings.EnumGamemode.SURVIVAL,
                         ChatComponentText(
-                            text
+                            "${text}_Z"
                         )
                     )
                 }
