@@ -51,7 +51,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 )
 
                                 for (i in 4 until 19) {
-                                    players[3] = this.createPlayerInfoDataFromText(
+                                    players[i] = this.createPlayerInfoDataFromText(
                                         _HiddenString.generate(10)
                                     )
                                 }
