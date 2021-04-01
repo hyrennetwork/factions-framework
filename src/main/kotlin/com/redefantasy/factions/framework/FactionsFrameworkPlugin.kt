@@ -26,11 +26,13 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
         CoreSpigotConstants.PROTOCOL_HANDLER.registerListener(
             object : PacketListener() {
 
-                override fun onSent(
+                override fun onReceive(
                     event: PacketEvent
                 ) {
                     try {
                         val packet = event.packet
+
+                        println("Packet: $packet")
 
                         if (packet is PacketPlayOutPlayerInfo) {
                             for (i in 0 until 160) {
