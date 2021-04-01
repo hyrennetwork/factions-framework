@@ -1,0 +1,6 @@
+name: Factions-Framework
+main: com.redefantasy.factions.framework.FactionsFrameworkPlugin
+version: 0.1-ALPHA
+author: Gutyerrez
+depend:
+  - Core
