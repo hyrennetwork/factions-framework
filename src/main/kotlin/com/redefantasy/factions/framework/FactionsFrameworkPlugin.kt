@@ -2,7 +2,6 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
-import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -58,12 +57,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 }
                             }
 
-                            val newPacket = PacketPlayOutPlayerInfo()
-
-                            newPacket.a = EnumPlayerInfoAction.UPDATE_DISPLAY_NAME
-                            newPacket.b.addAll(players)
-
-                            player.sendPacket(newPacket)
+                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
