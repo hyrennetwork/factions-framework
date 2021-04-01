@@ -5,10 +5,12 @@ import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
+import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
+import org.apache.commons.lang3.RandomStringUtils
 import java.util.*
 
 /**
@@ -62,19 +64,24 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 }
 
                 private fun createPlayerInfoDataFromText(text: String, i: Int = 0): PlayerInfoData {
+                    if (text.length > 32) throw IllegalArgumentException(
+                        "\"$text\" length (${text.length}) is higher than 32!"
+                    )
+
                     return PlayerInfoData(
                         GameProfile(
                             UUID.randomUUID(),
-//                            if (text.length > 32) RandomStringUtils.randomAlphabetic(16) else text
-                            text
+                            "${RandomStringUtils.randomAlphabetic(10)}_${i.toAlphabet()}"
                         ),
                         i,
                         WorldSettings.EnumGamemode.SURVIVAL,
-//                        if (text.length <= 16) null else ChatComponentText(
-//                            text
-//                        )
-                        null
+                        ChatComponentText(text)
                     )
+                }
+
+                private fun Int.toAlphabet(): String = when {
+                    this == 1 -> "A"
+                    else -> "Z"
                 }
 
             }
