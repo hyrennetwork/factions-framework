@@ -60,6 +60,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             val newPacket = PacketPlayOutPlayerInfo()
 
+                            newPacket.a = EnumPlayerInfoAction.UPDATE_DISPLAY_NAME
                             newPacket.b.addAll(players)
 
                             player.sendPacket(newPacket)
