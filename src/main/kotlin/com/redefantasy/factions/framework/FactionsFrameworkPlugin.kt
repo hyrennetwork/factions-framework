@@ -33,10 +33,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            for (i in 0 until 160) {
-                                packet.b.add(i, this.createPlayerInfoDataFromText("§0"))
-                            }
-
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
                                     packet.b[0] = this.createPlayerInfoDataFromText(
