@@ -2,6 +2,7 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
+import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -30,10 +31,15 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     event: PacketEvent
                 ) {
                     try {
+                        val player = event.player
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            val players = mutableMapOf<Int, PlayerInfoData>()
+                            val players = MutableList(80) {
+                                this.createPlayerInfoDataFromText(
+                                    "§0"
+                                )
+                            }
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
@@ -46,20 +52,18 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                     players[2] = this.createPlayerInfoDataFromText(
                                         "§6[Master] Gutyerrez"
                                     )
-
-                                    for (i in 3 until 80) {
-                                        players[i] = this.createPlayerInfoDataFromText(
-                                            "§0"
-                                        )
-                                    }
                                 }
                                 EnumPlayerInfoAction.REMOVE_PLAYER -> {
                                     println("Remover")
                                 }
                             }
 
-                            packet.b.clear()
-                            packet.b.addAll(players.values)
+                            val newPacket = PacketPlayOutPlayerInfo()
+
+                            newPacket.a = packet.a
+                            newPacket.b.addAll(players)
+
+                            player.sendPacket(newPacket)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
