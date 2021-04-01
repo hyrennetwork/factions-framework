@@ -10,7 +10,6 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
-import org.apache.commons.lang3.RandomStringUtils
 import java.util.*
 
 /**
@@ -71,12 +70,13 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     return PlayerInfoData(
                         GameProfile(
                             UUID.randomUUID(),
-                            if (text.length > 16) RandomStringUtils.randomAlphabetic(16) else text
+//                            if (text.length > 16) RandomStringUtils.randomAlphabetic(16) else text
+                            if (text.length > 16) null else text
                         ),
                         i,
                         WorldSettings.EnumGamemode.SURVIVAL,
-                        ChatComponentText(
-                            if (text.length <= 16) null else text
+                        if (text.length <= 16) null else ChatComponentText(
+                            text
                         )
                     )
                 }
