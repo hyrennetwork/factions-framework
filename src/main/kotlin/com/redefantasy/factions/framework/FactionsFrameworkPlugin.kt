@@ -1,7 +1,6 @@
 package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
-import com.redefantasy.core.shared.misc.kotlin.sizedArray
 import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
@@ -35,13 +34,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            val players = sizedArray<PlayerInfoData>(80)
-
-                            players.fill(
+                            val players = MutableList(80) {
                                 this.createPlayerInfoDataFromText(
                                     _HiddenString.generate(10)
                                 )
-                            )
+                            }
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
