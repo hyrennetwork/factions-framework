@@ -33,7 +33,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            val players = mutableListOf<PlayerInfoData>()
+                            val players = MutableList(80) {
+                                this.createPlayerInfoDataFromText(
+                                    "§0"
+                                )
+                            }
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
@@ -45,11 +49,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                     players.add(
                                         this.createPlayerInfoDataFromText(
                                             "§e[STF] STAFF"
-                                        )
-                                    )
-                                    players.add(
-                                        this.createPlayerInfoDataFromText(
-                                            "§0"
                                         )
                                     )
                                     players.add(
