@@ -30,7 +30,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     event: PacketEvent
                 ) {
                     try {
-                        val player = event.player
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
@@ -55,19 +54,18 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                         2
                                     )
                                 }
-                                EnumPlayerInfoAction.REMOVE_PLAYER -> {
-                                    println("Remover")
-                                }
                             }
 
-                            packet.b = players
+                            packet.b = players.sortedWith { o1, o2 ->
+                                players.indexOf(o2).compareTo(players.indexOf(o1))
+                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
 
-                private fun createPlayerInfoDataFromText(text: String, i: Int = 3): PlayerInfoData {
+                private fun createPlayerInfoDataFromText(text: String, i: Int = 0): PlayerInfoData {
                     if (text.length > 32) throw IllegalArgumentException(
                         "\"$text\" length is higher than 32!"
                     )
