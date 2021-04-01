@@ -43,13 +43,16 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
                                     players[0] = this.createPlayerInfoDataFromText(
-                                        "§e§lMINHA FACÇÃO"
+                                        "§e§lMINHA FACÇÃO",
+                                        0
                                     )
                                     players[1] = this.createPlayerInfoDataFromText(
-                                        "§e[STF] STAFF"
+                                        "§e[STF] STAFF",
+                                        1
                                     )
                                     players[2] = this.createPlayerInfoDataFromText(
-                                        "§6[Master] Gutyerrez"
+                                        "§6[Master] Gutyerrez",
+                                        2
                                     )
                                 }
                                 EnumPlayerInfoAction.REMOVE_PLAYER -> {
@@ -64,7 +67,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     }
                 }
 
-                private fun createPlayerInfoDataFromText(text: String): PlayerInfoData {
+                private fun createPlayerInfoDataFromText(text: String, i: Int = 3): PlayerInfoData {
                     if (text.length > 32) throw IllegalArgumentException(
                         "\"$text\" length is higher than 32!"
                     )
@@ -74,7 +77,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             UUID.randomUUID(),
                             RandomStringUtils.randomAlphabetic(16)
                         ),
-                        0,
+                        i,
                         WorldSettings.EnumGamemode.SURVIVAL,
                         ChatComponentText(
                             text
