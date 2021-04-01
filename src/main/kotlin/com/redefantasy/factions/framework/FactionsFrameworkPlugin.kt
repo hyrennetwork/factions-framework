@@ -24,15 +24,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     println("opa")
 
+                    println(packet)
+
                     if (packet is PacketPlayOutPlayerInfo) {
                         println("daleee")
                     }
-                }
-
-                override fun onReceive(
-                    event: PacketEvent
-                ) {
-                    println("Recebi")
                 }
 
             }
