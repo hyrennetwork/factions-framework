@@ -72,8 +72,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 }
 
                 private fun createPlayerInfoDataFromText(text: String): PlayerInfoData {
-                    if (text.length > 16) throw IllegalArgumentException(
-                        "\"$text\" length is higher than 16!"
+                    if (text.length > 32) throw IllegalArgumentException(
+                        "\"$text\" length is higher than 32!"
                     )
 
                     return PlayerInfoData(
