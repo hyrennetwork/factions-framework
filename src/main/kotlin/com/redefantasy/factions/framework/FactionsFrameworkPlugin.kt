@@ -31,39 +31,43 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 override fun onSent(
                     event: PacketEvent
                 ) {
-                    val packet = event.packet
+                    try {
+                        val packet = event.packet
 
-                    if (packet is PacketPlayOutPlayerInfo) {
-                        val players = sizedArray<PlayerInfoData>(80)
+                        if (packet is PacketPlayOutPlayerInfo) {
+                            val players = sizedArray<PlayerInfoData>(80)
 
-                        when (packet.a) {
-                            EnumPlayerInfoAction.ADD_PLAYER -> {
-                                players[0] = this.createPlayerInfoDataFromText(
-                                    "§e§lMINHA FACÇÃO"
+                            players.fill(
+                                this.createPlayerInfoDataFromText(
+                                    _HiddenString.generate(10)
                                 )
-                                players[1] = this.createPlayerInfoDataFromText(
-                                    "§e[STF] STAFF"
-                                )
-                                players[2] = this.createPlayerInfoDataFromText(
-                                    "§0"
-                                )
-                                players[3] = this.createPlayerInfoDataFromText(
-                                    "§6[Master] Gutyerrez"
-                                )
+                            )
 
-                                for (i in 4 until 75) {
-                                    players[i] = this.createPlayerInfoDataFromText(
-                                        _HiddenString.generate(10)
+                            when (packet.a) {
+                                EnumPlayerInfoAction.ADD_PLAYER -> {
+                                    players[0] = this.createPlayerInfoDataFromText(
+                                        "§e§lMINHA FACÇÃO"
+                                    )
+                                    players[1] = this.createPlayerInfoDataFromText(
+                                        "§e[STF] STAFF"
+                                    )
+                                    players[2] = this.createPlayerInfoDataFromText(
+                                        "§0"
+                                    )
+                                    players[3] = this.createPlayerInfoDataFromText(
+                                        "§6[Master] Gutyerrez"
                                     )
                                 }
+                                EnumPlayerInfoAction.REMOVE_PLAYER -> {
+                                    println("Remover")
+                                }
                             }
-                            EnumPlayerInfoAction.REMOVE_PLAYER -> {
-                                println("Remover")
-                            }
-                        }
 
-                        packet.b.clear()
-                        packet.b.addAll(players)
+                            packet.b.clear()
+                            packet.b.addAll(players)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
 
