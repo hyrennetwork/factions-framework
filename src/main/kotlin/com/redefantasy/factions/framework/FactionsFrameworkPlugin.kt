@@ -56,7 +56,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 }
                             }
 
-                            packet.b = players.toHashSet()
+                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
