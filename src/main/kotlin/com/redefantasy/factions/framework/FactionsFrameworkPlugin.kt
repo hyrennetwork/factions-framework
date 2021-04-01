@@ -33,11 +33,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-//                            val players = MutableList(160) {
-//                                this.createPlayerInfoDataFromText(
-//                                    "§0"
-//                                )
-//                            }
                             for (i in 0 until 160) {
                                 packet.b.add(i, this.createPlayerInfoDataFromText("§0"))
                             }
@@ -55,8 +50,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                     )
                                 }
                             }
-
-//                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
