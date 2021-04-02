@@ -1,9 +1,12 @@
 package com.redefantasy.factions.framework
 
 import com.redefantasy.core.spigot.CoreSpigotConstants
+import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
-import com.redefantasy.factions.framework.misc.tablist.PlayerList
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
+import net.minecraft.server.v1_8_R3.WorldSettings
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -29,12 +32,35 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     event: PlayerJoinEvent
                 ) {
                     val player = event.player
-                    val playerList = PlayerList(player, PlayerList.SIZE_FOUR)
 
-                    playerList.updateSlot(0,"Top left")
-                    playerList.updateSlot(19,"Bottom left")
-                    playerList.updateSlot(60,"Top right")
-                    playerList.updateSlot(79,"Bottom right")
+                    val tabs = java.lang.reflect.Array.newInstance(
+                        String::class.java,
+                        80
+                    )
+
+                    // Clear players
+
+                    var packet = PacketPlayOutPlayerInfo()
+
+                    packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
+
+                    Bukkit.getOnlinePlayers().forEach {
+                        val craftPlayer = it as CraftPlayer
+                        val gameProfile = craftPlayer.profile
+
+                        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
+                            gameProfile,
+                            0,
+                            WorldSettings.EnumGamemode.NOT_SET,
+                            null
+                        )
+
+                        packet.b.add(playerInfoData )
+                    }
+
+                    player.sendPacket(packet)
+
+                    // Clear players
                 }
 
             },
