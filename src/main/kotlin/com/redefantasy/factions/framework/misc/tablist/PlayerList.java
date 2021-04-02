@@ -137,7 +137,7 @@ public class PlayerList {
         WORLD_GAME_MODE_NOT_SET = a() ? ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") : null;
         PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = a()
                 ? (Constructor<?>) ReflectionUtil
-                .getConstructor(PACKET_PLAYER_INFO_DATA_CLASS/*, PACKET_PLAYER_INFO_CLASS*/, GAMEPROFILECLASS,
+                .getConstructor(PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
                         int.class, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS)
                 .get()
                 : null;
@@ -495,8 +495,7 @@ public class PlayerList {
     @SuppressWarnings("unchecked")
     @Deprecated
     private void addValue(int id, String name, UUID uuid, boolean updateProfToAddCustomSkin) {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
+        Object packet = ReflectionUtil.instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
         if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
             List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
             Object gameProfile = Bukkit.getPlayer(uuid) != null
