@@ -33,32 +33,33 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            packet.b.clear()
+                            event.cancelled = true
 
-                            for (i in 0 until 160) {
-                                packet.b.add(
-                                    this.createPlayerInfoDataFromText(
-                                        "§0"
-                                    )
+                            val players = List(160) {
+                                this.createPlayerInfoDataFromText(
+                                    "§0",
+                                    it
                                 )
                             }
 
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
-                                    packet.b[0] = this.createPlayerInfoDataFromText(
+                                    players[0] = this.createPlayerInfoDataFromText(
                                         "§e§lMINHA FACÇÃO",
                                         160
                                     )
-                                    packet.b[1] = this.createPlayerInfoDataFromText(
+                                    players[1] = this.createPlayerInfoDataFromText(
                                         "§e[STF] STAFF",
                                         159
                                     )
-                                    packet.b[2] = this.createPlayerInfoDataFromText(
+                                    players[2] = this.createPlayerInfoDataFromText(
                                         "§6[Master] Gutyerrez",
                                         158
                                     )
                                 }
                             }
+
+                            packet.b = players
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
