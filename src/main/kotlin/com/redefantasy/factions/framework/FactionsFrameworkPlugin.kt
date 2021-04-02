@@ -33,8 +33,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     playerList.updateSlot(0,"T. left");
                     playerList.updateSlot(16,"B. left");
-                    playerList.updateSlot(55,"T. right");
-                    playerList.updateSlot(70,"B. right");
+                    playerList.updateSlot(56,"T. right");
+                    playerList.updateSlot(73,"B. right");
                 }
 
             },
