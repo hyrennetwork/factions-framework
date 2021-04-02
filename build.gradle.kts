@@ -29,7 +29,11 @@ tasks {
 
         archiveFileName.set("${project.name}.jar")
 
-        with(sources.get())
+        include(
+            "PlayerList",
+            "com.redefantasy.factions.framework.misc.tablist.PlayerList",
+            "com.redefantasy.factions.framework.misc.tablist.PlayerList.java"
+        )
 
         doLast {
             try {
