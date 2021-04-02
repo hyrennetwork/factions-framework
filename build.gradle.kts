@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.0-M2"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("maven-publish")
@@ -29,7 +29,7 @@ tasks {
 
         archiveFileName.set("${project.name}.jar")
 
-        from(sources.get())
+        minimize()
 
         doLast {
             try {
