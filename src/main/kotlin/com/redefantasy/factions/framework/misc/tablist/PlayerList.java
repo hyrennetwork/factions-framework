@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -137,8 +138,7 @@ public class PlayerList {
         WORLD_GAME_MODE_NOT_SET = a() ? ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") : null;
         PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = a()
                 ? (Constructor<?>) ReflectionUtil
-                .getConstructor(PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
-                        int.class, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS)
+                .getConstructor(PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS, int.class, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS)
                 .get()
                 : null;
         if (ReflectionUtil.isVersionHigherThan(1, 7)) {
@@ -889,6 +889,9 @@ class ReflectionUtil {
      */
     protected static Object instantiate(Constructor<?> constructor, Object... arguments) {
         try {
+            System.out.println("Custrutor: " + constructor.getName());
+            System.out.println(new Gson().toJson(arguments));
+
             return constructor.newInstance(arguments);
         } catch (Exception e) {
             e.printStackTrace();
