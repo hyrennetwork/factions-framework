@@ -8,6 +8,7 @@ import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
 import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.apache.commons.lang3.RandomStringUtils
@@ -40,6 +41,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             val packet = PacketPlayOutPlayerInfo()
 
+                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.channels.add(CUSTOM_METADATA_KEY)
 
                             val players = MutableList(80) {
@@ -51,15 +53,15 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             players[0] = this.createPlayerInfoDataFromText(
                                 "§e§lMINHA FACÇÃO",
-                                160
+                                79
                             )
                             players[1] = this.createPlayerInfoDataFromText(
                                 "§e[STF] STAFF",
-                                159
+                                78
                             )
                             players[2] = this.createPlayerInfoDataFromText(
                                 "§6[Master] Gutyerrez",
-                                158
+                                77
                             )
 
                             packet.b = players
