@@ -502,8 +502,9 @@ public class PlayerList {
                     : ReflectionUtil.instantiate(GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id) + name);
             Object[] array = (Object[]) ReflectionUtil.invokeMethod(CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
                     new Class[]{String.class}, getNameFromID(id) + name);
-            Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                    WORLD_GAME_MODE_NOT_SET, array[0]);
+
+            Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, gameProfile, 0, WORLD_GAME_MODE_NOT_SET, array[0]);
+
             SkinCallBack call = new SkinCallBack() {
                 @Override
                 public void callBack(Skin skin, boolean successful, Exception exception) {
