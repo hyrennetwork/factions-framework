@@ -55,9 +55,7 @@ class PlayerList(player: Player, size: Int) {
         private var WORLD_GAME_MODE_CLASS: Class<*>
         private val GAMEPROFILECLASS = GameProfile::class.java
         private val PROPERTYCLASS = Property::class.java
-        private val GAMEPROPHILECONSTRUCTOR =
-            ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java)
-                .get() as Constructor<*>
+        private val GAMEPROPHILECONSTRUCTOR = ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java)
         private val CRAFTPLAYERCLASS = CraftPlayer::class.java
         private var WORLD_GAME_MODE_NOT_SET: WorldSettings.EnumGamemode
         private val CRAFT_CHAT_MESSAGE_CLASS = ChatMessage::class.java
@@ -230,7 +228,7 @@ class PlayerList(player: Player, size: Int) {
             PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
                 Int::class.java, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS
-            ).get() as Constructor<*>
+            )
 
             if (ReflectionUtil.isVersionHigherThan(1, 7)) {
                 PACKET_HEADER_FOOTER_CLASS = PacketPlayOutPlayerListHeaderFooter::class.java
@@ -326,7 +324,7 @@ class PlayerList(player: Player, size: Int) {
             for (i in players.indices) {
                 try {
                     val packetLoop = ReflectionUtil.instantiate(
-                        ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>
+                        ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS)
                     )
                     sendOLDTabPackets(player, packetLoop, players[i].name, false)
                 } catch (e: Exception) {
@@ -341,8 +339,8 @@ class PlayerList(player: Player, size: Int) {
      * Clears all the custom tabs from the player's tablist.
      */
     fun clearCustomTabs() {
-        val packet =
-            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        val packet = ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS))
+
         if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
             val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
             for (playerData in ArrayList(datas)) tabs[getIDFromName(
@@ -358,7 +356,7 @@ class PlayerList(player: Player, size: Int) {
         } else {
             for (i in 0 until size) if (datasOLD.containsKey(i)) try {
                 val packetLoop = ReflectionUtil.instantiate(
-                    ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>
+                    ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS)
                 )
                 sendOLDTabPackets(player, packetLoop, datasOLD[i], false)
                 tabs[i] = null
