@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.4.31"
 
+    id("java")
     id("java-library")
     id("maven-publish")
     id("com.github.johnrengelman.shadow") version "6.1.0"
@@ -13,6 +14,8 @@ repositories {
     mavenCentral()
 
     mavenLocal()
+
+    jcenter()
 }
 
 tasks {
@@ -41,6 +44,12 @@ tasks {
                 ex.printStackTrace()
             }
         }
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs("main/kotlin")
     }
 }
 
