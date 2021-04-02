@@ -36,8 +36,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
-                            val packet = PacketPlayOutPlayerInfo()
-
                             val players = MutableList(20) {
                                 this.createPlayerInfoDataFromText(
                                     "§0",
