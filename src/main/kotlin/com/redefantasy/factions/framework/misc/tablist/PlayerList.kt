@@ -705,7 +705,7 @@ internal object ReflectionUtil {
         if (fInt < mainVersion) return false
         val secondChar = StringBuilder()
 
-        for (i in 3..9) {
+        for (i in 2..8) {
             if (SERVER_VERSION[i] == '_' || SERVER_VERSION[i] == '.') break
             secondChar.append(SERVER_VERSION[i])
         }
