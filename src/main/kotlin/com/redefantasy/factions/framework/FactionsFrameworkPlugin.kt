@@ -56,6 +56,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 77
                             )
 
+                            println(players.size)
+
                             packet.a = EnumPlayerInfoAction.REMOVE_PLAYER
                             packet.b = players
                             packet.channels.add(CUSTOM_METADATA_KEY)
