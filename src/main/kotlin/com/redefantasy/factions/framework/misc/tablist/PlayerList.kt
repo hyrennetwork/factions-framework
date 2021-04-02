@@ -27,7 +27,6 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
-import java.net.URISyntaxException
 import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -56,9 +55,11 @@ class PlayerList(player: Player, size: Int) {
         private var WORLD_GAME_MODE_CLASS: Class<*>
         private val GAMEPROFILECLASS = GameProfile::class.java
         private val PROPERTYCLASS = Property::class.java
-        private val GAMEPROPHILECONSTRUCTOR = ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java).get() as Constructor<*>
+        private val GAMEPROPHILECONSTRUCTOR =
+            ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java)
+                .get() as Constructor<*>
         private val CRAFTPLAYERCLASS = CraftPlayer::class.java
-        private var WORLD_GAME_MODE_NOT_SET: Any
+        private var WORLD_GAME_MODE_NOT_SET: WorldSettings.EnumGamemode
         private val CRAFT_CHAT_MESSAGE_CLASS = ChatMessage::class.java
         private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = PacketPlayOutPlayerInfo.EnumPlayerInfoAction::class.java
         private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
@@ -204,19 +205,18 @@ class PlayerList(player: Player, size: Int) {
         }
 
         init {
-            // It's hacky, I know, but atleast it gets a plugin instance.
-            try {
-                val f = File(Skin::class.java.protectionDomain.codeSource.location.toURI().path)
-                for (p in Bukkit.getPluginManager().plugins) {
-                    if (f.getName().contains(p.getName())
-                    ) {
-                        plugin = p
-                        break
-                    }
+            val f = File(Skin::class.java.protectionDomain.codeSource.location.toURI().path)
+
+            for (p in Bukkit.getPluginManager().plugins) {
+                if (f.getName().contains(p.getName())
+                ) {
+                    plugin = p
+                    break
                 }
-            } catch (e: URISyntaxException) {
             }
+
             if (plugin == null) plugin = Bukkit.getPluginManager().plugins[0]
+
             WORLD_GAME_MODE_CLASS = WorldSettings.EnumGamemode::class.java
             CHAT_SERIALIZER = IChatBaseComponent.ChatSerializer::class.java
             PROPERTY = Property::class.java
@@ -226,18 +226,15 @@ class PlayerList(player: Player, size: Int) {
 
             PROPERTY_MAP = PropertyMap::class.java
 
-            WORLD_GAME_MODE_NOT_SET = ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET")!!
+            WORLD_GAME_MODE_NOT_SET = WorldSettings.EnumGamemode.NOT_SET
             PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
                 Int::class.java, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS
             ).get() as Constructor<*>
+
             if (ReflectionUtil.isVersionHigherThan(1, 7)) {
-                try {
-                    PACKET_HEADER_FOOTER_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerListHeaderFooter")
-                    PACKET_HEADER_FOOTER_CONSTRUCTOR = PACKET_HEADER_FOOTER_CLASS!!.constructors[0]
-                } catch (e: Exception) {
-                } catch (e: Error) {
-                }
+                PACKET_HEADER_FOOTER_CLASS = PacketPlayOutPlayerListHeaderFooter::class.java
+                PACKET_HEADER_FOOTER_CONSTRUCTOR = PACKET_HEADER_FOOTER_CLASS.constructors[0]
             }
         }
     }
@@ -288,8 +285,8 @@ class PlayerList(player: Player, size: Int) {
      * Clears all players from the player's tablist.
      */
     fun clearPlayers() {
-        val packet =
-            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        val packet = PacketPlayOutPlayerInfo()
+
         if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
             val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
             val olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null)
@@ -311,14 +308,10 @@ class PlayerList(player: Player, size: Int) {
                         arrayOfNulls<Class<*>?>(0)
                     )
                 )
-                val array = ReflectionUtil.invokeMethod(
-                    CRAFT_CHAT_MESSAGE_CLASS, null, "fromString", arrayOf(
-                        String::class.java
-                    ), player.name
-                ) as Array<Any>?
-                val data = ReflectionUtil.instantiate(
-                    PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                    WORLD_GAME_MODE_NOT_SET, array!![0]
+                val data = PacketPlayOutPlayerInfo.PlayerInfoData(
+                    gameProfile, 0, WORLD_GAME_MODE_NOT_SET, ChatComponentText(
+                        player.name
+                    )
                 )
                 players!!.add(data)
             }
@@ -867,17 +860,8 @@ internal object ReflectionUtil {
      * @return The Constructor or an empty Optional if there is none with these
      * parameters
      */
-    fun getConstructor(clazz: Class<*>, vararg params: Class<*>): Optional<*> {
-        try {
-            return Optional.of(clazz.getConstructor(*params))
-        } catch (e: NoSuchMethodException) {
-            try {
-                return Optional.of(clazz.getDeclaredConstructor(*params))
-            } catch (e2: NoSuchMethodException) {
-                e2.printStackTrace()
-            }
-        }
-        return Optional.empty<Any>()
+    fun getConstructor(clazz: Class<*>, vararg params: Class<*>): Constructor<*> {
+        return clazz.constructors.first()
     }
 
     /**
