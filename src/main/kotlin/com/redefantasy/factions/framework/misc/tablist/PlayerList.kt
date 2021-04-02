@@ -54,12 +54,16 @@ class PlayerList(
             this.getNameFromIndex(index) + name,
         )
 
+        val _name = this.getNameFromIndex(index) + name
+
+        println(_name)
+
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
             gameProfile,
             0,
             WorldSettings.EnumGamemode.NOT_SET,
             CraftChatMessage.fromString(
-                this.getNameFromIndex(index) + name
+                _name
             )[0]
         )
 
