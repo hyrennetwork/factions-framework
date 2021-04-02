@@ -31,7 +31,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     playerList.initTable()
 
-                    playerList.updateSlot(-2,"T. left");
+                    playerList.updateSlot(0,"T. left");
                     playerList.updateSlot(15,"B. left");
                     playerList.updateSlot(56,"T. right");
                     playerList.updateSlot(78,"B. right");
