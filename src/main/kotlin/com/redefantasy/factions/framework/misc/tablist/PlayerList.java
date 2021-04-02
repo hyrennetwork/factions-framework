@@ -505,6 +505,8 @@ public class PlayerList {
                     new Class[]{String.class}, getNameFromID(id) + name);
             Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
                     WORLD_GAME_MODE_NOT_SET, array[0]);
+
+            System.out.println("Data: " + (data == null));
             SkinCallBack call = new SkinCallBack() {
                 @Override
                 public void callBack(Skin skin, boolean successful, Exception exception) {
