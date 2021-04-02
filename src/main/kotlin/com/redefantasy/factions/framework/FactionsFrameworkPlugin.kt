@@ -35,7 +35,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         if (packet is PacketPlayOutPlayerInfo) {
                             event.cancelled = true
 
-                            val players = List(160) {
+                            val players = MutableList(160) {
                                 this.createPlayerInfoDataFromText(
                                     "§0",
                                     it
