@@ -769,7 +769,7 @@ class ReflectionUtil {
      */
     @SuppressWarnings("rawtypes")
     protected static Object invokeMethod(Object handle, String methodName, Class[] parameterClasses, Object... args) {
-        return invokeMethod(null, handle, methodName, parameterClasses, args);
+        return invokeMethod(handle.getClass(), handle, methodName, parameterClasses, args);
     }
 
     /**
