@@ -2,7 +2,6 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
-import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -36,13 +35,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val player = event.player
                         val packet = event.packet
 
-                        if (packet is PacketPlayOutPlayerInfo) {
-                            event.cancelled = true
-
-                            if (packet.channels.contains(CUSTOM_METADATA_KEY)) {
-                                return
-                            }
-
+                        if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
                             val packet = PacketPlayOutPlayerInfo()
 
                             val players = MutableList(20) {
@@ -67,10 +60,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             packet.a = EnumPlayerInfoAction.REMOVE_PLAYER
                             packet.b = players
-
                             packet.channels.add(CUSTOM_METADATA_KEY)
-
-                            player.sendPacket(packet)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
