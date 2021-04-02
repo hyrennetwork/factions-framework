@@ -374,8 +374,6 @@ public class PlayerList {
      */
     @SuppressWarnings("unchecked")
     public void removePlayer(Player player) {
-        lookUpTable.remove(player.getUniqueId());
-
         Object packet = ReflectionUtil.instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
         if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
             List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");

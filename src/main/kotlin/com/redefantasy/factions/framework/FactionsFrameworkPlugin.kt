@@ -34,9 +34,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     playerList.removePlayer(player)
 
                     playerList.updateSlot(0,"Top left");
-//                    playerList.updateSlot(19,"Bottom left");
-//                    playerList.updateSlot(60,"Top right");
-//                    playerList.updateSlot(79,"Bottom right");
+                    playerList.updateSlot(19,"Bottom left");
+
+                    playerList.updateSlot(44,"Notch", true);
+
+                    playerList.updateSlot(60,"Top right");
+                    playerList.updateSlot(79,"Bottom right");
                 }
 
             },
