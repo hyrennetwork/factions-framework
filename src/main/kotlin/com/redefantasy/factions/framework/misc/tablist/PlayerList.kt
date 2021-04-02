@@ -7,6 +7,7 @@ import com.google.common.cache.LoadingCache
 import com.google.common.collect.Maps
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import com.mojang.authlib.properties.PropertyMap
 import net.minecraft.server.v1_8_R3.*
 import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
@@ -218,20 +219,13 @@ class PlayerList(player: Player, size: Int) {
             if (plugin == null) plugin = Bukkit.getPluginManager().plugins[0]
             WORLD_GAME_MODE_CLASS = WorldSettings.EnumGamemode::class.java
             CHAT_SERIALIZER = IChatBaseComponent.ChatSerializer::class.java
-            PROPERTY = ReflectionUtil.getMojangAuthClass("properties.Property")
+            PROPERTY = Property::class.java
             PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PROPERTY, String::class.java, String::class.java, String::class.java
             ).get() as Constructor<*>
-            if (PROPERTY == null || PROPERTY_CONSTRUCTOR == null) {
-                PROPERTY = ReflectionUtil.getOLDAuthlibClass("properties.Property")
-                PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
-                    PROPERTY, *arrayOf<Class<*>>(
-                        String::class.java, String::class.java, String::class.java
-                    )
-                ).get() as Constructor<*>
-            } else {
-                PROPERTY_MAP = ReflectionUtil.getMojangAuthClass("properties.PropertyMap")
-            }
+
+            PROPERTY_MAP = PropertyMap::class.java
+
             WORLD_GAME_MODE_NOT_SET = ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET")!!
             PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
