@@ -44,7 +44,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.channels.add(CUSTOM_METADATA_KEY)
 
-                            val players = MutableList(160) {
+                            val players = MutableList(80) {
                                 this.createPlayerInfoDataFromText(
                                     "§0",
                                     it
