@@ -1,9 +1,9 @@
 plugins {
     kotlin("jvm") version "1.4.31"
 
-    id("application")
-    id("maven-publish")
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("maven-publish")
+    id("java")
 }
 
 group = "com.redefantasy"
@@ -17,10 +17,6 @@ repositories {
     jcenter()
 }
 
-application {
-    mainClass.set("com.redefanasy.factions.framework.FactionsFrameworkPlugin")
-}
-
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -32,6 +28,8 @@ tasks {
         val fileName = "${project.name}.jar"
 
         archiveFileName.set("${project.name}.jar")
+
+        with(sources.get())
 
         doLast {
             try {
