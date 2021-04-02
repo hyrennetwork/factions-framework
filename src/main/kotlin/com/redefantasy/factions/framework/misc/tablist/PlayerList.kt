@@ -705,7 +705,7 @@ internal object ReflectionUtil {
         if (fInt < mainVersion) return false
         val secondChar = StringBuilder()
 
-        for (i in 2..8) {
+        for (i in 0..8) {
             if (SERVER_VERSION[i] == '_' || SERVER_VERSION[i] == '.') break
             secondChar.append(SERVER_VERSION[i])
         }
@@ -969,12 +969,16 @@ internal object ReflectionUtil {
     init {
         val name = Bukkit.getServer().javaClass.name
 
+        println(name)
+
         SERVER_VERSION = name.substring(
             name.indexOf("craftbukkit.") + "craftbukkit.".length
         ).substring(
             0,
             name.indexOf(".")
         )
+
+        println("Server version: ${SERVER_VERSION}")
     }
 }
 
