@@ -513,13 +513,12 @@ public class PlayerList {
                         try {
                             Object map = ReflectionUtil.invokeMethod(profile, "getProperties", new Class[0]);
                             if (skin.getBase64() != null && skin.getSignedBase64() != null) {
-                                if (!ReflectionUtil.isVersionHigherThan(1, 13)) {
-                                    ReflectionUtil.invokeMethod(map, "removeAll", new Class[]{String.class},
-                                            "textures");
+                                /*if (!ReflectionUtil.isVersionHigherThan(1, 13)) {
+                                    ReflectionUtil.invokeMethod(map, "removeAll", new Class[]{String.class}, "textures");
                                 } else {
                                     ReflectionUtil.invokeMethod(map, "removeAll", new Class[]{Object.class},
                                             "textures");
-                                }
+                                }*/
                                 Object prop = ReflectionUtil.instantiate(PROPERTY_CONSTRUCTOR, "textures",
                                         skin.getBase64(), skin.getSignedBase64());
                                 Method m = null;
