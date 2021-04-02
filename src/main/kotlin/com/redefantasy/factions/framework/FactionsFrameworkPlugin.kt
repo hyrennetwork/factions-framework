@@ -36,11 +36,13 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val player = event.player
                         val packet = event.packet
 
-                        if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
+                        if (packet is PacketPlayOutPlayerInfo) {
                             println(packet.a)
                             println(packet.channels.contains(CUSTOM_METADATA_KEY))
 
                             event.cancelled = true
+
+                            if (!packet.channels.contains(CUSTOM_METADATA_KEY)) return
 
                             val packet = PacketPlayOutPlayerInfo()
 
