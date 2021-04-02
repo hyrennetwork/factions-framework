@@ -33,6 +33,16 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
+                            packet.b.clear()
+
+                            for (i in 0 until 160) {
+                                packet.b.add(
+                                    this.createPlayerInfoDataFromText(
+                                        "§0"
+                                    )
+                                )
+                            }
+
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
                                     packet.b[0] = this.createPlayerInfoDataFromText(
@@ -52,7 +62,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     }
                 }
 
-                private fun createPlayerInfoDataFromText(text: String, i: Int = 0): PlayerInfoData {
+                private fun createPlayerInfoDataFromText(text: String, ping: Int = 0): PlayerInfoData {
                     if (text.length > 32) throw IllegalArgumentException(
                         "\"$text\" length (${text.length}) is higher than 32!"
                     )
@@ -62,7 +72,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             UUID.randomUUID(),
                             RandomStringUtils.randomAlphabetic(16)
                         ),
-                        i,
+                        0,
+                        ping,
                         WorldSettings.EnumGamemode.SURVIVAL,
                         ChatComponentText(text)
                     )
