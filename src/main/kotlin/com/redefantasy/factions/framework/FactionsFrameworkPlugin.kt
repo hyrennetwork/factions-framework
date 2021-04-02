@@ -27,7 +27,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 ) {
                     val player = event.player
 
-                    val playerList = PlayerList(player, 2)
+                    val playerList = PlayerList(player, PlayerList.SIZE_FOUR)
 
                     playerList.initTable()
 
