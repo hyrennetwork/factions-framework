@@ -19,7 +19,6 @@ import org.json.simple.parser.JSONParser
 import java.io.*
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
-import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
@@ -47,32 +46,34 @@ import java.util.stream.Collectors
 class PlayerList(player: Player, size: Int) {
 
     companion object {
-        private val PACKET_PLAYER_INFO_CLASS = if (a(7)) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo") else ReflectionUtil.getNMSClass("Packet201PlayerInfo")
-        private val PACKET_PLAYER_INFO_DATA_CLASS = if (a()) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$PlayerInfoData") else null
-        private var WORLD_GAME_MODE_CLASS: Class<*>? = null
-        protected val GAMEPROFILECLASS = if (a()) ReflectionUtil.getMojangAuthClass("GameProfile") else null
-        protected val PROPERTYCLASS = if (a()) ReflectionUtil.getMojangAuthClass("properties.Property") else null
-        private val GAMEPROPHILECONSTRUCTOR = if (a()) ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java)
-                .get() as Constructor<*> else null
+        private val PACKET_PLAYER_INFO_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo")
+        private val PACKET_PLAYER_INFO_DATA_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$PlayerInfoData")
+        private var WORLD_GAME_MODE_CLASS: Class<*>
+        private val GAMEPROFILECLASS = ReflectionUtil.getMojangAuthClass("GameProfile")
+        private val PROPERTYCLASS = ReflectionUtil.getMojangAuthClass("properties.Property")
+        private val GAMEPROPHILECONSTRUCTOR = ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java).get() as Constructor<*>
         private val CRAFTPLAYERCLASS = ReflectionUtil.getCraftbukkitClass("CraftPlayer", "entity")
-        private var WORLD_GAME_MODE_NOT_SET: Any? = null
-        private val CRAFT_CHAT_MESSAGE_CLASS = if (a()) ReflectionUtil.getCraftbukkitClass("CraftChatMessage", "util") else null
-        private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = if (a()) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$EnumPlayerInfoAction") else null
-        private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = if (a()) ReflectionUtil.getEnumConstant(
+        private var WORLD_GAME_MODE_NOT_SET: Any
+        private val CRAFT_CHAT_MESSAGE_CLASS = ReflectionUtil.getCraftbukkitClass("CraftChatMessage", "util")
+        private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$EnumPlayerInfoAction")
+        private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = ReflectionUtil.getEnumConstant(
             PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "REMOVE_PLAYER"
-        ) else null
-        private val PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = if (a()) ReflectionUtil.getEnumConstant(
+        )
+        private val PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = ReflectionUtil.getEnumConstant(
             PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "ADD_PLAYER"
-        ) else null
+        )
         private val PACKET_CLASS = ReflectionUtil.getNMSClass("Packet")
-        private val I_CHAT_BASE_COMPONENT_CLASS = if (a()) ReflectionUtil.getNMSClass("IChatBaseComponent") else null
-        private var PACKET_PLAYER_INFO_DATA_CONSTRUCTOR: Constructor<*>? = null
-        private var PACKET_HEADER_FOOTER_CLASS: Class<*>? = null
-        private var PACKET_HEADER_FOOTER_CONSTRUCTOR: Constructor<*>? = null
-        private var CHAT_SERIALIZER: Class<*>? = null
-        private var PROPERTY: Class<*>? = null
-        private var PROPERTY_CONSTRUCTOR: Constructor<*>? = null
-        private var PROPERTY_MAP: Class<*>? = null
+        private val I_CHAT_BASE_COMPONENT_CLASS = ReflectionUtil.getNMSClass("IChatBaseComponent")
+
+        private lateinit var PACKET_PLAYER_INFO_DATA_CONSTRUCTOR: Constructor<*>
+        private lateinit var PACKET_HEADER_FOOTER_CLASS: Class<*>
+        private lateinit var PACKET_HEADER_FOOTER_CONSTRUCTOR: Constructor<*>
+
+        private lateinit var CHAT_SERIALIZER: Class<*>
+        private lateinit var PROPERTY: Class<*>
+        private lateinit var PROPERTY_CONSTRUCTOR: Constructor<*>
+        private lateinit var PROPERTY_MAP: Class<*>
+
         private fun invokeChatSerializerA(text: String): Any? {
             return ReflectionUtil.invokeMethod(
                 CHAT_SERIALIZER, null, "a", arrayOf(
@@ -236,13 +237,11 @@ class PlayerList(player: Player, size: Int) {
             } else {
                 PROPERTY_MAP = ReflectionUtil.getMojangAuthClass("properties.PropertyMap")
             }
-            WORLD_GAME_MODE_NOT_SET =
-                if (a()) ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") else null
-            PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = if (a()) ReflectionUtil.getConstructor(
+            WORLD_GAME_MODE_NOT_SET = ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET")!!
+            PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
-                Int::class.javaPrimitiveType, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS
-            )
-                .get() as Constructor<*> else null
+                Int::class.java, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS
+            ).get() as Constructor<*>
             if (ReflectionUtil.isVersionHigherThan(1, 7)) {
                 try {
                     PACKET_HEADER_FOOTER_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerListHeaderFooter")
@@ -711,12 +710,8 @@ internal object ReflectionUtil {
      *
      * @return The NMS class or null if an error occurred
      */
-    fun getNMSClass(name: String): Class<*>? {
-        return try {
-            Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name)
-        } catch (e: ClassNotFoundException) {
-            null
-        }
+    fun getNMSClass(name: String): Class<*> {
+        return Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name)
     }
 
     /**
@@ -727,12 +722,8 @@ internal object ReflectionUtil {
      *
      * @return The NMS class or null if an error occurred
      */
-    fun getOLDAuthlibClass(name: String): Class<*>? {
-        return try {
-            Class.forName("net.minecraft.util.com.mojang.authlib.$name")
-        } catch (e: ClassNotFoundException) {
-            null
-        }
+    fun getOLDAuthlibClass(name: String): Class<*> {
+        return Class.forName("net.minecraft.util.com.mojang.authlib.$name")
     }
 
     /**
@@ -744,11 +735,7 @@ internal object ReflectionUtil {
      * @return The CraftBukkit class or null if an error occurred
      */
     fun getCraftbukkitClass(name: String, packageName: String): Class<*>? {
-        return try {
-            Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + packageName + "." + name)
-        } catch (e: ClassNotFoundException) {
-            null
-        }
+        return Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + packageName + "." + name)
     }
 
     /**
@@ -759,15 +746,11 @@ internal object ReflectionUtil {
      *
      * @return The mojang.authlib class or null if an error occurred
      */
-    fun getMojangAuthClass(name: String): Class<*>? {
-        return try {
-            if (PlayerList.a()) {
-                Class.forName("com.mojang.authlib.$name")
-            } else {
-                Class.forName("net.minecraft.util.com.mojang.authlib.$name")
-            }
-        } catch (e: ClassNotFoundException) {
-            null
+    fun getMojangAuthClass(name: String): Class<*> {
+        return if (PlayerList.a()) {
+            Class.forName("com.mojang.authlib.$name")
+        } else {
+            Class.forName("net.minecraft.util.com.mojang.authlib.$name")
         }
     }
 
@@ -812,16 +795,12 @@ internal object ReflectionUtil {
         vararg args: Any?
     ): Any? {
         val methodOptional = getMethod(clazz, methodName, *parameterClasses!!)
+
         if (!methodOptional.isPresent) return null
+
         val method = methodOptional.get()
-        try {
-            return method.invoke(handle, *args)
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        }
-        return null
+
+        return method.invoke(handle, *args)
     }
 
     /**
@@ -836,10 +815,15 @@ internal object ReflectionUtil {
      */
     fun setInstanceField(handle: Any?, name: String?, value: Any?) {
         val clazz: Class<*> = handle!!.javaClass
+
         val fieldOptional = getField(clazz, name)
+
         if (!fieldOptional.isPresent) return
+
         val field = fieldOptional.get()
+
         if (!field.isAccessible) field.isAccessible = true
+
         try {
             field[handle] = value
         } catch (e: IllegalAccessException) {
@@ -883,7 +867,9 @@ internal object ReflectionUtil {
      */
     fun getEnumConstant(enumClass: Class<*>?, name: String): Any? {
         if (!enumClass!!.isEnum) return null
+
         for (o in enumClass.enumConstants) if (name == invokeMethod(o, "name", arrayOfNulls<Class<*>?>(0))) return o
+
         return null
     }
 
@@ -898,12 +884,12 @@ internal object ReflectionUtil {
      * @return The Constructor or an empty Optional if there is none with these
      * parameters
      */
-    fun getConstructor(clazz: Class<*>?, vararg params: Class<*>?): Optional<*> {
+    fun getConstructor(clazz: Class<*>, vararg params: Class<*>): Optional<*> {
         try {
-            return Optional.of(clazz!!.getConstructor(*params))
+            return Optional.of(clazz.getConstructor(*params))
         } catch (e: NoSuchMethodException) {
             try {
-                return Optional.of(clazz!!.getDeclaredConstructor(*params))
+                return Optional.of(clazz.getDeclaredConstructor(*params))
             } catch (e2: NoSuchMethodException) {
                 e2.printStackTrace()
             }
