@@ -41,6 +41,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             val packet = PacketPlayOutPlayerInfo()
 
+                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.channels.add(CUSTOM_METADATA_KEY)
 
                             val players = MutableList(160) {
@@ -67,7 +68,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 }
                             }
 
-                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.b = players
 
                             player.sendPacket(packet)
