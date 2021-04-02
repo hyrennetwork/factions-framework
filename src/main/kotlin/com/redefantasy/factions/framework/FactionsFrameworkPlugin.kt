@@ -2,6 +2,7 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
+import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -11,7 +12,6 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.apache.commons.lang3.RandomStringUtils
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import java.util.*
 
 /**
@@ -24,7 +24,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
     override fun onEnable() {
         super.onEnable()
 
-        val CUSTOM_METADATA_KEY = "hyze_custom_packet"
+        val CUSTOM_METADATA_KEY = "hyren_custom_packet"
 
         CoreSpigotConstants.PROTOCOL_HANDLER.registerListener(
             object : PacketListener() {
@@ -37,9 +37,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo) {
-                            println(packet.a)
-                            println(packet.channels.contains(CUSTOM_METADATA_KEY))
-
                             event.cancelled = true
 
                             if (packet.channels.contains(CUSTOM_METADATA_KEY)) {
@@ -73,12 +70,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             packet.channels.add(CUSTOM_METADATA_KEY)
 
-                            val craftPlayer = player as CraftPlayer
-                            val handle = craftPlayer.handle
-                            val playerConnection = handle.playerConnection
-                            val networkManager = playerConnection.networkManager
-
-                            networkManager.handle(packet)
+                            player.sendPacket(packet)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
