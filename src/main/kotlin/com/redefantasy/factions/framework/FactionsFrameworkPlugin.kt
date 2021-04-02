@@ -2,7 +2,6 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
-import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -12,6 +11,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.EnumPlayerInfoAction
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo.PlayerInfoData
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.apache.commons.lang3.RandomStringUtils
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import java.util.*
 
 /**
@@ -69,7 +69,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                             packet.channels.add(CUSTOM_METADATA_KEY)
 
-                            player.sendPacket(packet)
+                            val craftPlayer = player as CraftPlayer
+                            val handle = craftPlayer.handle
+                            val playerConnection = handle.playerConnection
+                            val networkManager = playerConnection.networkManager
+
+                            networkManager.handle(packet)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
