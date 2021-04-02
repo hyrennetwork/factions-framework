@@ -17,6 +17,16 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+    main {
+        java {
+            setSrcDirs(
+                listOf("src/main/kotlin")
+            )
+        }
+    }
+}
+
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -29,7 +39,6 @@ tasks {
 
         archiveFileName.set("${project.name}.jar")
 
-        minimize()
 
         doLast {
             try {
