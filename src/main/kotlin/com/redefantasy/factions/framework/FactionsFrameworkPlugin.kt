@@ -2,6 +2,7 @@ package com.redefantasy.factions.framework
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.spigot.CoreSpigotConstants
+import com.redefantasy.core.spigot.misc.player.sendPacket
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.utils.PacketEvent
 import com.redefantasy.core.spigot.misc.utils.PacketListener
@@ -23,6 +24,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
     override fun onEnable() {
         super.onEnable()
 
+        val CUSTOM_METADATA_KEY = "hyze_custom_packet"
+
         CoreSpigotConstants.PROTOCOL_HANDLER.registerListener(
             object : PacketListener() {
 
@@ -30,10 +33,15 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     event: PacketEvent
                 ) {
                     try {
+                        val player = event.player
                         val packet = event.packet
 
-                        if (packet is PacketPlayOutPlayerInfo) {
+                        if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
                             event.cancelled = true
+
+                            val packet = PacketPlayOutPlayerInfo()
+
+                            packet.channels.add(CUSTOM_METADATA_KEY)
 
                             val players = MutableList(160) {
                                 this.createPlayerInfoDataFromText(
@@ -59,7 +67,10 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 }
                             }
 
+                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.b = players
+
+                            player.sendPacket(packet)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
