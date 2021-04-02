@@ -137,7 +137,7 @@ public class PlayerList {
         WORLD_GAME_MODE_NOT_SET = a() ? ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") : null;
         PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = a()
                 ? (Constructor<?>) ReflectionUtil
-                .getConstructor(/*PACKET_PLAYER_INFO_DATA_CLASS,*/ PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
+                .getConstructor(PACKET_PLAYER_INFO_DATA_CLASS/*, PACKET_PLAYER_INFO_CLASS*/, GAMEPROFILECLASS,
                         int.class, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS)
                 .get()
                 : null;
