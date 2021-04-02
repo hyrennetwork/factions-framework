@@ -27,11 +27,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 ) {
                     val player = event.player
 
-                    val playerList = PlayerList.getPlayerList(player) ?: PlayerList(player, PlayerList.SIZE_FOUR)
+                    val playerList = PlayerList(player, PlayerList.SIZE_FOUR)
 
                     playerList.initTable()
 
-                    playerList.removePlayer(player)
+                    playerList.resetTablist()
 
                     playerList.updateSlot(0,"T. left");
                     playerList.updateSlot(19,"B. left");
