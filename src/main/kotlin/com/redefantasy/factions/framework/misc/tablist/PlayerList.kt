@@ -6,11 +6,14 @@ import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.collect.Maps
 import com.mojang.authlib.GameProfile
+import com.mojang.authlib.properties.Property
+import net.minecraft.server.v1_8_R3.*
 import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.serialization.ConfigurationSerializable
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -47,24 +50,20 @@ import java.util.stream.Collectors
 class PlayerList(player: Player, size: Int) {
 
     companion object {
-        private val PACKET_PLAYER_INFO_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo")
-        private val PACKET_PLAYER_INFO_DATA_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$PlayerInfoData")
+        private val PACKET_PLAYER_INFO_CLASS = PacketPlayOutPlayerInfo::class.java
+        private val PACKET_PLAYER_INFO_DATA_CLASS = PacketPlayOutPlayerInfo.PlayerInfoData::class.java
         private var WORLD_GAME_MODE_CLASS: Class<*>
-        private val GAMEPROFILECLASS = ReflectionUtil.getMojangAuthClass("GameProfile")
-        private val PROPERTYCLASS = ReflectionUtil.getMojangAuthClass("properties.Property")
+        private val GAMEPROFILECLASS = GameProfile::class.java
+        private val PROPERTYCLASS = Property::class.java
         private val GAMEPROPHILECONSTRUCTOR = ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java).get() as Constructor<*>
-        private val CRAFTPLAYERCLASS = ReflectionUtil.getCraftbukkitClass("CraftPlayer", "entity")
+        private val CRAFTPLAYERCLASS = CraftPlayer::class.java
         private var WORLD_GAME_MODE_NOT_SET: Any
-        private val CRAFT_CHAT_MESSAGE_CLASS = ReflectionUtil.getCraftbukkitClass("CraftChatMessage", "util")
-        private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$EnumPlayerInfoAction")
-        private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = ReflectionUtil.getEnumConstant(
-            PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "REMOVE_PLAYER"
-        )
-        private val PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = ReflectionUtil.getEnumConstant(
-            PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "ADD_PLAYER"
-        )
-        private val PACKET_CLASS = ReflectionUtil.getNMSClass("Packet")
-        private val I_CHAT_BASE_COMPONENT_CLASS = ReflectionUtil.getNMSClass("IChatBaseComponent")
+        private val CRAFT_CHAT_MESSAGE_CLASS = ChatMessage::class.java
+        private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = PacketPlayOutPlayerInfo.EnumPlayerInfoAction::class.java
+        private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
+        private val PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
+        private val PACKET_CLASS = Packet::class.java
+        private val I_CHAT_BASE_COMPONENT_CLASS = IChatBaseComponent::class.java
 
         private lateinit var PACKET_PLAYER_INFO_DATA_CONSTRUCTOR: Constructor<*>
         private lateinit var PACKET_HEADER_FOOTER_CLASS: Class<*>
@@ -217,16 +216,11 @@ class PlayerList(player: Player, size: Int) {
             } catch (e: URISyntaxException) {
             }
             if (plugin == null) plugin = Bukkit.getPluginManager().plugins[0]
-            WORLD_GAME_MODE_CLASS = ReflectionUtil.getNMSClass("EnumGamemode")
-            if (WORLD_GAME_MODE_CLASS == null) WORLD_GAME_MODE_CLASS =
-                ReflectionUtil.getNMSClass("WorldSettings\$EnumGamemode")
-            CHAT_SERIALIZER = ReflectionUtil.getNMSClass("IChatBaseComponent\$ChatSerializer")
-            if (CHAT_SERIALIZER == null) CHAT_SERIALIZER = ReflectionUtil.getNMSClass("ChatSerializer")
+            WORLD_GAME_MODE_CLASS = WorldSettings.EnumGamemode::class.java
+            CHAT_SERIALIZER = IChatBaseComponent.ChatSerializer::class.java
             PROPERTY = ReflectionUtil.getMojangAuthClass("properties.Property")
             PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
-                PROPERTY, *arrayOf<Class<*>>(
-                    String::class.java, String::class.java, String::class.java
-                )
+                PROPERTY, String::class.java, String::class.java, String::class.java
             ).get() as Constructor<*>
             if (PROPERTY == null || PROPERTY_CONSTRUCTOR == null) {
                 PROPERTY = ReflectionUtil.getOLDAuthlibClass("properties.Property")
