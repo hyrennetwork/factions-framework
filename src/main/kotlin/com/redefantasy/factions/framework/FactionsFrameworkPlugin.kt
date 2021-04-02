@@ -36,31 +36,32 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
-                            val players = MutableList(20) {
-                                this.createPlayerInfoDataFromText(
-                                    "§0",
-                                    it
+                            if (packet.a == EnumPlayerInfoAction.ADD_PLAYER) {
+                                val players = MutableList(20) {
+                                    this.createPlayerInfoDataFromText(
+                                        "§0",
+                                        it
+                                    )
+                                }
+
+                                players[0] = this.createPlayerInfoDataFromText(
+                                    "§e§lMINHA FACÇÃO",
+                                    79
                                 )
+                                players[1] = this.createPlayerInfoDataFromText(
+                                    "§e[STF] STAFF",
+                                    78
+                                )
+                                players[2] = this.createPlayerInfoDataFromText(
+                                    "§6[Master] Gutyerrez",
+                                    77
+                                )
+
+                                println(players.size)
+
+                                packet.b = players
+                                packet.channels.add(CUSTOM_METADATA_KEY)
                             }
-
-                            players[0] = this.createPlayerInfoDataFromText(
-                                "§e§lMINHA FACÇÃO",
-                                79
-                            )
-                            players[1] = this.createPlayerInfoDataFromText(
-                                "§e[STF] STAFF",
-                                78
-                            )
-                            players[2] = this.createPlayerInfoDataFromText(
-                                "§6[Master] Gutyerrez",
-                                77
-                            )
-
-                            println(players.size)
-
-                            packet.a = EnumPlayerInfoAction.REMOVE_PLAYER
-                            packet.b = players
-                            packet.channels.add(CUSTOM_METADATA_KEY)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
