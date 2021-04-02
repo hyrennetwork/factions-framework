@@ -252,8 +252,7 @@ public class PlayerList {
                         .cast(ReflectionUtil.invokeMethod(player, "getProfile", new Class[0]));
                 Object[] array = (Object[]) ReflectionUtil.invokeMethod(CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
                         new Class[]{String.class}, player.getName());
-                Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                        WORLD_GAME_MODE_NOT_SET, array[0]);
+                Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, gameProfile, 1, WORLD_GAME_MODE_NOT_SET, array[0]);
                 players.add(data);
             }
             sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
