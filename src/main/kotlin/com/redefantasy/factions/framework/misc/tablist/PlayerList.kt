@@ -17,7 +17,7 @@ import java.util.*
  */
 class PlayerList(
     private val player: Player,
-    private val size: Int = 80
+    size: Int = 80
 ) {
 
     private val DATAS = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
@@ -30,7 +30,7 @@ class PlayerList(
     )
 
     init {
-        for (i in 0..size) this.update(i, "")
+        for (i in 0 until size) this.update(i, "")
     }
 
     fun update(
@@ -40,7 +40,7 @@ class PlayerList(
         this.add(index, text, UUID.randomUUID())
     }
 
-    fun add(
+    private fun add(
         index: Int,
         name: String,
         uuid: UUID
