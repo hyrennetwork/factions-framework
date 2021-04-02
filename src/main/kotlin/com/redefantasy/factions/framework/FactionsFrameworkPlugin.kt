@@ -46,13 +46,16 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                             when (packet.a) {
                                 EnumPlayerInfoAction.ADD_PLAYER -> {
                                     packet.b[0] = this.createPlayerInfoDataFromText(
-                                        "§e§lMINHA FACÇÃO"
+                                        "§e§lMINHA FACÇÃO",
+                                        160
                                     )
                                     packet.b[1] = this.createPlayerInfoDataFromText(
-                                        "§e[STF] STAFF"
+                                        "§e[STF] STAFF",
+                                        159
                                     )
                                     packet.b[2] = this.createPlayerInfoDataFromText(
-                                        "§6[Master] Gutyerrez"
+                                        "§6[Master] Gutyerrez",
+                                        158
                                     )
                                 }
                             }
@@ -62,7 +65,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     }
                 }
 
-                private fun createPlayerInfoDataFromText(text: String, ping: Int = 0): PlayerInfoData {
+                private fun createPlayerInfoDataFromText(text: String, position: Int = 0, ping: Int = 0): PlayerInfoData {
                     if (text.length > 32) throw IllegalArgumentException(
                         "\"$text\" length (${text.length}) is higher than 32!"
                     )
