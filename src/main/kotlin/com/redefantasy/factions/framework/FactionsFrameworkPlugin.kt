@@ -37,12 +37,11 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
+                            println(packet.channels.contains(CUSTOM_METADATA_KEY))
+
                             event.cancelled = true
 
                             val packet = PacketPlayOutPlayerInfo()
-
-                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
-                            packet.channels.add(CUSTOM_METADATA_KEY)
 
                             val players = MutableList(20) {
                                 this.createPlayerInfoDataFromText(
@@ -64,7 +63,10 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 77
                             )
 
+                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
                             packet.b = players
+
+                            packet.channels.add(CUSTOM_METADATA_KEY)
 
                             player.sendPacket(packet)
                         }
