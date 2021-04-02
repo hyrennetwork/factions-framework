@@ -17,15 +17,15 @@ repositories {
     jcenter()
 }
 
+application {
+    mainClass.set("com.redefanasy.factions.framework.FactionsFrameworkPlugin")
+}
+
 tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "1.8"
         }
-    }
-
-    application {
-        mainClass.set("com.redefanasy.factions.framework.FactionsFrameworkPlugin")
     }
 
     shadowJar {
