@@ -87,11 +87,7 @@ class PlayerList(
         val firstLetter = COLOR_DECODER[index / 15]
         val secondLetter = COLOR_DECODER[index % 15]
 
-        return arrayOf(
-            ChatColor.getByChar(firstLetter),
-            ChatColor.getByChar(secondLetter),
-            ChatColor.RESET
-        ).contentToString()
+        return "${ChatColor.getByChar(firstLetter)}${ChatColor.getByChar(secondLetter)}${ChatColor.RESET}"
     }
 
     private fun getIndexFromName(name: String): Int {
