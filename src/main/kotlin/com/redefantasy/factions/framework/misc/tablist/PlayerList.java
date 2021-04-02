@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -505,8 +504,6 @@ public class PlayerList {
                     new Class[]{String.class}, getNameFromID(id) + name);
             Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
                     WORLD_GAME_MODE_NOT_SET, array[0]);
-
-            System.out.println("Data: " + (data == null));
             SkinCallBack call = new SkinCallBack() {
                 @Override
                 public void callBack(Skin skin, boolean successful, Exception exception) {
@@ -771,8 +768,6 @@ class ReflectionUtil {
      */
     @SuppressWarnings("rawtypes")
     protected static Object invokeMethod(Object handle, String methodName, Class[] parameterClasses, Object... args) {
-        System.out.println("Handle: " + (handle == null));
-
         return invokeMethod(handle.getClass(), handle, methodName, parameterClasses, args);
     }
 
@@ -893,9 +888,6 @@ class ReflectionUtil {
      */
     protected static Object instantiate(Constructor<?> constructor, Object... arguments) {
         try {
-            System.out.println("Custrutor: " + constructor.getName());
-            System.out.println(new Gson().toJson(arguments));
-
             return constructor.newInstance(arguments);
         } catch (Exception e) {
             e.printStackTrace();
