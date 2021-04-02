@@ -35,9 +35,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     playerList.updateSlot(0,"T. left");
                     playerList.updateSlot(19,"B. left");
-
-                    playerList.updateSlot(44,"Notch", true);
-
                     playerList.updateSlot(60,"T. right");
                     playerList.updateSlot(79,"B. right");
                 }
