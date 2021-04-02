@@ -3,6 +3,7 @@ package com.redefantasy.factions.framework.misc.tablist;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -253,14 +254,14 @@ public class PlayerList {
                 Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, gameProfile, 1, WORLD_GAME_MODE_NOT_SET, array[0]);
                 players.add(data);
             }
+
             sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
         } else {
             Object olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null);
             Object[] players = olp instanceof Collection ? ((Collection<?>) olp).toArray() : (Object[]) olp;
             for (int i = 0; i < players.length; i++) {
                 try {
-                    Object packetLoop = ReflectionUtil.instantiate(
-                            (Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
+                    Object packetLoop = ReflectionUtil.instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
                     sendOLDTabPackets(getPlayer(), packetLoop, ((Player) players[i]).getName(), false);
                 } catch (Exception e) {
                     error();
@@ -352,7 +353,7 @@ public class PlayerList {
      */
     public void updateSlot(int id, String newName, UUID uuid, boolean usePlayersSkin) {
         if (a()) {
-            removeCustomTab(id, true);
+            removeCustomTab(id, false);
             addValue(id, newName, uuid, usePlayersSkin);
             hasCustomTexture[id] = usePlayersSkin;
         } else {
@@ -489,7 +490,7 @@ public class PlayerList {
     private void addValue(int id, String name, UUID uuid, boolean updateProfToAddCustomSkin) {
         Object packet = ReflectionUtil.instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
         if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
+            List<Object> players = /*(List<Object>) ReflectionUtil.getInstanceField(packet, "b");*/Lists.newArrayList();
             Object gameProfile = Bukkit.getPlayer(uuid) != null
                     ? ReflectionUtil.invokeMethod(getHandle(Bukkit.getPlayer(uuid)), "getProfile", new Class[0])
                     : ReflectionUtil.instantiate(GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id) + name);
