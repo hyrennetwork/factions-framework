@@ -1,7 +1,6 @@
 package com.redefantasy.factions.framework.misc.tablist
 
 import com.mojang.authlib.GameProfile
-import com.redefantasy.core.shared.misc.kotlin.sizedArray
 import com.redefantasy.core.shared.misc.utils.ChatColor
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
@@ -19,10 +18,6 @@ class PlayerList(
     private val player: Player,
     size: Int = 80
 ) {
-
-    private val DATAS = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
-
-    private val PLAYER_INFO_DATA_NAME = sizedArray<String>(80)
 
     private val COLOR_DECODER = arrayOf(
         '0', '1', '2', '3', '4', '5', '6', '7',
@@ -69,11 +64,7 @@ class PlayerList(
             )[0]
         )
 
-        PLAYER_INFO_DATA_NAME[this.getIndexFromName(gameProfile.name)] = gameProfile.name
-
-        players.add(playerInfoData)
-
-        DATAS.add(playerInfoData)
+        players.add(index, playerInfoData)
 
         packet.channels.add(CHANNEL_NAME)
 
