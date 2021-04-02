@@ -37,6 +37,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                         val packet = event.packet
 
                         if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(CUSTOM_METADATA_KEY)) {
+                            println(packet.a)
                             println(packet.channels.contains(CUSTOM_METADATA_KEY))
 
                             event.cancelled = true
@@ -63,7 +64,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                                 77
                             )
 
-                            packet.a = EnumPlayerInfoAction.ADD_PLAYER
+                            packet.a = EnumPlayerInfoAction.REMOVE_PLAYER
                             packet.b = players
 
                             packet.channels.add(CUSTOM_METADATA_KEY)
