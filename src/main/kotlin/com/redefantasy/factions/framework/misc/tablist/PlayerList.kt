@@ -96,7 +96,7 @@ class PlayerList(
         var total = 0
 
         for (i in 0 until size) {
-            if (COLOR_DECODER[i - 1] == name[0]) {
+            if (COLOR_DECODER[i] == name[0]) {
                 total = 15 * i
 
                 break
@@ -104,7 +104,7 @@ class PlayerList(
         }
 
         for (i in 0 until size) {
-            if (COLOR_DECODER[i - 1] == name[1]) {
+            if (COLOR_DECODER[i] == name[1]) {
                 total += i
 
                 break
