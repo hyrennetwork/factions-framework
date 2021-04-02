@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.collect.Maps
+import com.mojang.authlib.GameProfile
 import org.apache.commons.lang.Validate
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -746,13 +747,7 @@ internal object ReflectionUtil {
      *
      * @return The mojang.authlib class or null if an error occurred
      */
-    fun getMojangAuthClass(name: String): Class<*> {
-        return if (PlayerList.a()) {
-            Class.forName("com.mojang.authlib.$name")
-        } else {
-            Class.forName("net.minecraft.util.com.mojang.authlib.$name")
-        }
-    }
+    fun getMojangAuthClass(name: String) = GameProfile::class.java
 
     /**
      * Invokes the method
