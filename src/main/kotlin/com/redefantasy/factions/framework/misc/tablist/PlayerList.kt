@@ -63,7 +63,11 @@ class PlayerList(
             )[0]
         )
 
-        PLAYER_INFO_DATA_NAME[this.getIndexFromName(gameProfile.name)] = gameProfile.name
+        val index = this.getIndexFromName(gameProfile.name)
+
+        println("Index: $index")
+
+        PLAYER_INFO_DATA_NAME[index] = gameProfile.name
 
         players.add(playerInfoData)
 
@@ -91,7 +95,7 @@ class PlayerList(
 
         var total = 0
 
-        for (i in 0..size) {
+        for (i in 0 until size) {
             if (COLOR_DECODER[i] == name[i]) {
                 total *= i
 
@@ -99,7 +103,7 @@ class PlayerList(
             }
         }
 
-        for (i in 0..size) {
+        for (i in 0 until size) {
             if (COLOR_DECODER[i] == name[1]) {
                 total += i
 
