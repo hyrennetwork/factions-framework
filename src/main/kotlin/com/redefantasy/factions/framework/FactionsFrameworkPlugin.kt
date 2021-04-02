@@ -16,8 +16,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
     override fun onEnable() {
         super.onEnable()
 
-        val playerList = PlayerList(null, PlayerList.SIZE_FOUR)
-
         val pluginManager = Bukkit.getServer().pluginManager
 
         pluginManager.registerEvents(
@@ -30,6 +28,13 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val player = event.player
 
 
+                    val playerList = PlayerList(player, PlayerList.SIZE_FOUR)
+                    playerList.initTable()
+
+                    playerList.updateSlot(0,"Top left");
+                    playerList.updateSlot(19,"Bottom left");
+                    playerList.updateSlot(60,"Top right");
+                    playerList.updateSlot(79,"Bottom right");
                 }
 
             },
