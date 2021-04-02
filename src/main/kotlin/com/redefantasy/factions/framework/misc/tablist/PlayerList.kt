@@ -3,7 +3,10 @@ package com.redefantasy.factions.framework.misc.tablist
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.shared.misc.kotlin.sizedArray
 import com.redefantasy.core.shared.misc.utils.ChatColor
+import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.player.sendPacket
+import com.redefantasy.core.spigot.misc.utils.PacketEvent
+import com.redefantasy.core.spigot.misc.utils.PacketListener
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.bukkit.Bukkit
@@ -29,7 +32,29 @@ class PlayerList(
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     )
 
+    companion object {
+
+        const val CHANNEL_NAME = "hyren_custom_tab_list"
+
+    }
+
     init {
+        CoreSpigotConstants.PROTOCOL_HANDLER.registerListener(
+            object : PacketListener() {
+
+                override fun onSent(
+                    event: PacketEvent
+                ) {
+                    val packet = event.packet
+
+                    if (packet is PacketPlayOutPlayerInfo) {
+                        event.cancelled = !packet.channels.contains(CHANNEL_NAME)
+                    }
+                }
+
+            }
+        )
+
         for (i in 0 until size) this.update(i, "")
     }
 
@@ -76,6 +101,8 @@ class PlayerList(
         players.add(playerInfoData)
 
         DATAS.add(playerInfoData)
+
+        packet.channels.add(CHANNEL_NAME)
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
         packet.b = players
