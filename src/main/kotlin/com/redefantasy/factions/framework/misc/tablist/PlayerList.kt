@@ -17,26 +17,17 @@ import java.util.*
  */
 class PlayerList(
     private val player: Player,
-    private val size: Int = SIZE_FOUR
+    private val size: Int = 80
 ) {
 
     private val DATAS = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
 
     private val PLAYER_INFO_DATA_NAME = sizedArray<String>(80)
 
-    companion object {
-
-        const val SIZE_ONE = 20
-        const val SIZE_TWO = 40
-        const val SIZE_THREE = 60
-        const val SIZE_FOUR = 80
-
-        private val COLOR_DECODER = arrayOf(
-            '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-        )
-
-    }
+    private val COLOR_DECODER = arrayOf(
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    )
 
     init {
         for (i in 0..size) this.update(i, "")
