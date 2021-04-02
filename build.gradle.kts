@@ -25,6 +25,10 @@ tasks {
     }
 
     shadowJar {
+        application {
+            mainClass.set("com.redefanasy.factions.framework.FactionsFrameworkPlugin")
+        }
+        
         val fileName = "${project.name}.jar"
 
         archiveFileName.set("${project.name}.jar")
