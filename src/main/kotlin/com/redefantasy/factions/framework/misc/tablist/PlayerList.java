@@ -769,6 +769,8 @@ class ReflectionUtil {
      */
     @SuppressWarnings("rawtypes")
     protected static Object invokeMethod(Object handle, String methodName, Class[] parameterClasses, Object... args) {
+        System.out.println("Handle: " + (handle == null));
+
         return invokeMethod(handle.getClass(), handle, methodName, parameterClasses, args);
     }
 
