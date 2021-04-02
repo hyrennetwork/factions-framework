@@ -29,10 +29,7 @@ tasks {
 
         archiveFileName.set("${project.name}.jar")
 
-        append("PlayerList")
-        append("PlayerList.java")
-        append("com.redefantasy.factions.framework.misc.tablist.PlayerList.java")
-        append("com.redefantasy.factions.framework.misc.tablist.PlayerList")
+        from(sources.get())
 
         doLast {
             try {
