@@ -63,3 +63,20 @@ dependencies {
     compileOnly("com.redefantasy:core-shared:0.1-ALPHA")
     compileOnly("com.redefantasy:core-spigot:0.1-ALPHA")
 }
+
+val sources by tasks.registering(Jar::class) {
+    archiveFileName.set(project.name)
+    archiveClassifier.set("sources")
+    archiveVersion.set(null as String?)
+
+    from(sourceSets.main.get().allSource)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["kotlin"])
+            artifact(sources.get())
+        }
+    }
+}
