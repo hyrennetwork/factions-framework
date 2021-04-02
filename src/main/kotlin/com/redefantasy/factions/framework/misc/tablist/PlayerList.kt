@@ -1,33 +1,33 @@
-package com.redefantasy.factions.framework.misc.tablist;
+package com.redefantasy.factions.framework.misc.tablist
 
-import com.google.common.base.Strings;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import com.google.common.base.Strings
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
+import com.google.common.collect.Maps
+import org.apache.commons.lang.Validate
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.OfflinePlayer
+import org.bukkit.configuration.serialization.ConfigurationSerializable
+import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
+import org.bukkit.scheduler.BukkitRunnable
+import org.json.simple.JSONArray
+import org.json.simple.JSONObject
+import org.json.simple.parser.JSONParser
+import java.io.*
+import java.lang.reflect.Constructor
+import java.lang.reflect.Field
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
+import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 
 /*
  *  Copyright (C) 2017 Zombie_Striker
@@ -44,233 +44,313 @@ import java.util.stream.Collectors;
  *  if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
  *  02111-1307 USA
  */
+class PlayerList(player: Player, size: Int) {
 
-public class PlayerList {
-    private static final Class<?> PACKET_PLAYER_INFO_CLASS = a(7)
-            ? ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo")
-            : ReflectionUtil.getNMSClass("Packet201PlayerInfo");
-    private static final Class<?> PACKET_PLAYER_INFO_DATA_CLASS = a()
-            ? ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo$PlayerInfoData")
-            : null;
-    private static Class<?> WORLD_GAME_MODE_CLASS;
-    protected static final Class<?> GAMEPROFILECLASS = a() ? ReflectionUtil.getMojangAuthClass("GameProfile") : null;
-    protected static final Class<?> PROPERTYCLASS = a() ? ReflectionUtil.getMojangAuthClass("properties.Property")
-            : null;
-    private static final Constructor<?> GAMEPROPHILECONSTRUCTOR = a()
-            ? (Constructor<?>) ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID.class, String.class).get()
-            : null;
-    private static final Class<?> CRAFTPLAYERCLASS = ReflectionUtil.getCraftbukkitClass("CraftPlayer", "entity");
-    private static final Object WORLD_GAME_MODE_NOT_SET;
-    private static final Class<?> CRAFT_CHAT_MESSAGE_CLASS = a()
-            ? ReflectionUtil.getCraftbukkitClass("CraftChatMessage", "util")
-            : null;
-    private static final Class<?> PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = a()
-            ? ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo$EnumPlayerInfoAction")
-            : null;
-    private static final Object PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = a()
-            ? ReflectionUtil.getEnumConstant(PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "REMOVE_PLAYER")
-            : null;
-    private static final Object PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = a()
-            ? ReflectionUtil.getEnumConstant(PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "ADD_PLAYER")
-            : null;
-    private static final Class<?> PACKET_CLASS = ReflectionUtil.getNMSClass("Packet");
-    private static final Class<?> I_CHAT_BASE_COMPONENT_CLASS = a() ? ReflectionUtil.getNMSClass("IChatBaseComponent")
-            : null;
-    private static final Constructor<?> PACKET_PLAYER_INFO_DATA_CONSTRUCTOR;
+    companion object {
+        private val PACKET_PLAYER_INFO_CLASS = if (a(7)) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo") else ReflectionUtil.getNMSClass("Packet201PlayerInfo")
+        private val PACKET_PLAYER_INFO_DATA_CLASS = if (a()) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$PlayerInfoData") else null
+        private var WORLD_GAME_MODE_CLASS: Class<*>? = null
+        protected val GAMEPROFILECLASS = if (a()) ReflectionUtil.getMojangAuthClass("GameProfile") else null
+        protected val PROPERTYCLASS = if (a()) ReflectionUtil.getMojangAuthClass("properties.Property") else null
+        private val GAMEPROPHILECONSTRUCTOR = if (a()) ReflectionUtil.getConstructor(GAMEPROFILECLASS, UUID::class.java, String::class.java)
+                .get() as Constructor<*> else null
+        private val CRAFTPLAYERCLASS = ReflectionUtil.getCraftbukkitClass("CraftPlayer", "entity")
+        private var WORLD_GAME_MODE_NOT_SET: Any? = null
+        private val CRAFT_CHAT_MESSAGE_CLASS = if (a()) ReflectionUtil.getCraftbukkitClass("CraftChatMessage", "util") else null
+        private val PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS = if (a()) ReflectionUtil.getNMSClass("PacketPlayOutPlayerInfo\$EnumPlayerInfoAction") else null
+        private val PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER = if (a()) ReflectionUtil.getEnumConstant(
+            PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "REMOVE_PLAYER"
+        ) else null
+        private val PACKET_PLAYER_INFO_ACTION_ADD_PLAYER = if (a()) ReflectionUtil.getEnumConstant(
+            PACKET_PLAYER_INFO_PLAYER_ACTION_CLASS, "ADD_PLAYER"
+        ) else null
+        private val PACKET_CLASS = ReflectionUtil.getNMSClass("Packet")
+        private val I_CHAT_BASE_COMPONENT_CLASS = if (a()) ReflectionUtil.getNMSClass("IChatBaseComponent") else null
+        private var PACKET_PLAYER_INFO_DATA_CONSTRUCTOR: Constructor<*>? = null
+        private var PACKET_HEADER_FOOTER_CLASS: Class<*>? = null
+        private var PACKET_HEADER_FOOTER_CONSTRUCTOR: Constructor<*>? = null
+        private var CHAT_SERIALIZER: Class<*>? = null
+        private var PROPERTY: Class<*>? = null
+        private var PROPERTY_CONSTRUCTOR: Constructor<*>? = null
+        private var PROPERTY_MAP: Class<*>? = null
+        private fun invokeChatSerializerA(text: String): Any? {
+            return ReflectionUtil.invokeMethod(
+                CHAT_SERIALIZER, null, "a", arrayOf(
+                    String::class.java
+                ),
+                "{\"text\":\"$text\"}"
+            )
+        }
 
-    private static Class<?> PACKET_HEADER_FOOTER_CLASS;
-    private static Constructor<?> PACKET_HEADER_FOOTER_CONSTRUCTOR = null;
-    private static Class<?> CHAT_SERIALIZER;
+        // TODO: This bit of code has been added to check specifically for 1.7.10.
+        // update. Since this update has changes to it's spawnplayer packet, this
+        // hopefully will fix issues with player disconnection on that update
+        //
+        // http://wiki.vg/Protocol_History#14w04a
+        // ||ReflectionUtil.SERVER_VERSION.contains("7_R4")
+        var plugin: Plugin? = null
+        private val colorcodeOrder = "0123456789abcdef".split("").toTypedArray()
+        private val inviscodeOrder = arrayOf(",", ".", "\'", "`", " ")
+        var SIZE_DEFAULT = 20
+        var SIZE_TWO = 40
+        var SIZE_THREE = 60
+        var SIZE_FOUR = 80
+        private val lookUpTable = HashMap<UUID, PlayerList>()
 
-    private static Class<?> PROPERTY;
-    private static Constructor<?> PROPERTY_CONSTRUCTOR;
+        /**
+         * Due to the amount of times I have to check if a version is higher than 1.8,
+         * all reflection calls will be replace with this method.
+         *
+         * @param update
+         * @return
+         */
+        fun a(vararg update: Int): Boolean {
+            return ReflectionUtil.isVersionHigherThan(1, if (update.size > 0) update[0] else 8)
+        }
 
-    private static Class<?> PROPERTY_MAP;
+        /**
+         * Tries to return an existing table instance for a player. If one does not
+         * exist, it will create a new one with a default size.
+         *
+         * @param player
+         * @return null or the player's tablist.
+         */
+        fun getPlayerList(player: Player): PlayerList? {
+            return if (!lookUpTable.containsKey(player.uniqueId)) PlayerList(
+                player,
+                SIZE_TWO
+            ) else lookUpTable[player.uniqueId]
+        }
 
-    private static Object invokeChatSerializerA(String text) {
-        return ReflectionUtil.invokeMethod(CHAT_SERIALIZER, null, "a", new Class[] { String.class },
-                "{\"text\":\"" + text + "\"}");
-    }
+        private fun sendNEWTabPackets(player: Player, packet: Any?, players: List<*>?, action: Any?) {
+            try {
+                ReflectionUtil.setInstanceField(packet, "a", action)
+                ReflectionUtil.setInstanceField(packet, "b", players)
+                sendPacket(packet, player)
+            } catch (e: Exception) {
+                error()
+                e.printStackTrace()
+            }
+        }
 
-    // TODO: This bit of code has been added to check specifically for 1.7.10.
-    // update. Since this update has changes to it's spawnplayer packet, this
-    // hopefully will fix issues with player disconnection on that update
-    //
-    // http://wiki.vg/Protocol_History#14w04a
-    // ||ReflectionUtil.SERVER_VERSION.contains("7_R4")
+        private fun sendOLDTabPackets(player: Player, packet: Any?, name: String?, isOnline: Boolean) {
+            try {
+                ReflectionUtil.setInstanceField(packet, "a", name)
+                ReflectionUtil.setInstanceField(packet, "b", isOnline)
+                ReflectionUtil.setInstanceField(packet, "c", 0.toShort())
+                sendPacket(packet, player)
+            } catch (e: Exception) {
+                error()
+                e.printStackTrace()
+            }
+        }
 
-    static Plugin plugin;
+        private fun sendPacket(packet: Any?, player: Player) {
+            val handle = getHandle(player)
+            val playerConnection = ReflectionUtil.getInstanceField(handle, "playerConnection")
+            ReflectionUtil.invokeMethod(playerConnection, "sendPacket", arrayOf(PACKET_CLASS), packet)
+        }
 
-    static {
-        // It's hacky, I know, but atleast it gets a plugin instance.
-        try {
-            File f = new File(Skin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-                if (f.getName().contains(p.getName())) {
-                    plugin = p;
-                    break;
+        private fun getHandle(player: Player): Any? {
+            return ReflectionUtil.invokeMethod(CRAFTPLAYERCLASS!!.cast(player), "getHandle", arrayOfNulls<Class<*>?>(0))
+        }
+
+        private fun getNameFromID(id: Int): String {
+            var a = colorcodeOrder
+            var size1 = 15
+            if (!a()) {
+                a = inviscodeOrder
+                size1 = 5
+            }
+            val firstletter = a[id / size1]
+            val secondletter = a[id % size1]
+            return if (a()) ChatColor.getByChar(firstletter).toString() + "" + ChatColor.getByChar(
+                secondletter
+            ) + ChatColor.RESET else firstletter + secondletter
+        }
+
+        private fun getIDFromName(id: String?): Int {
+            var a = colorcodeOrder
+            var size1 = 15
+            var indexAdder = 0
+            if (!a()) {
+                a = inviscodeOrder
+                size1 = 5
+                indexAdder = 1
+            }
+            var total = 0
+            for (i in a.indices) {
+                if (a[i].equals(id!![0 + indexAdder].toString() + "", ignoreCase = true)) {
+                    total = size1 * i
+                    break
                 }
             }
-        } catch (URISyntaxException e) {
-        }
-        if (plugin == null)
-            plugin = Bukkit.getPluginManager().getPlugins()[0];
-
-        WORLD_GAME_MODE_CLASS = ReflectionUtil.getNMSClass("EnumGamemode");
-        if (WORLD_GAME_MODE_CLASS == null)
-            WORLD_GAME_MODE_CLASS = ReflectionUtil.getNMSClass("WorldSettings$EnumGamemode");
-        CHAT_SERIALIZER = ReflectionUtil.getNMSClass("IChatBaseComponent$ChatSerializer");
-        if (CHAT_SERIALIZER == null)
-            CHAT_SERIALIZER = ReflectionUtil.getNMSClass("ChatSerializer");
-        PROPERTY = ReflectionUtil.getMojangAuthClass("properties.Property");
-        PROPERTY_CONSTRUCTOR = (Constructor<?>) ReflectionUtil
-                .getConstructor(PROPERTY, new Class[] { String.class, String.class, String.class }).get();
-
-        if (PROPERTY == null || PROPERTY_CONSTRUCTOR == null) {
-            PROPERTY = ReflectionUtil.getOLDAuthlibClass("properties.Property");
-            PROPERTY_CONSTRUCTOR = (Constructor<?>) ReflectionUtil
-                    .getConstructor(PROPERTY, new Class[] { String.class, String.class, String.class }).get();
-        } else {
-            PROPERTY_MAP = ReflectionUtil.getMojangAuthClass("properties.PropertyMap");
+            for (i in a.indices) {
+                if (a[i].equals(id!![1 + (indexAdder + indexAdder)].toString() + "", ignoreCase = true)) {
+                    total += i
+                    break
+                }
+            }
+            return total
         }
 
-        WORLD_GAME_MODE_NOT_SET = a() ? ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") : null;
-        PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = a()
-                ? (Constructor<?>) ReflectionUtil
-                .getConstructor(PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
-                        int.class, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS)
-                .get()
-                : null;
-        if (ReflectionUtil.isVersionHigherThan(1, 7)) {
+        private fun error() {
+            Bukkit.broadcastMessage(
+                "PLEASE REPORT THIS ISSUE TO" + ChatColor.RED + " ZOMBIE_STRIKER" + ChatColor.RESET
+                        + " ON THE BUKKIT FORUMS"
+            )
+        }
+
+        init {
+            // It's hacky, I know, but atleast it gets a plugin instance.
             try {
-                PACKET_HEADER_FOOTER_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerListHeaderFooter");
-                PACKET_HEADER_FOOTER_CONSTRUCTOR = PACKET_HEADER_FOOTER_CLASS.getConstructors()[0];
-            } catch (Exception | Error e) {
+                val f = File(Skin::class.java.protectionDomain.codeSource.location.toURI().path)
+                for (p in Bukkit.getPluginManager().plugins) {
+                    if (f.getName().contains(p.getName())
+                    ) {
+                        plugin = p
+                        break
+                    }
+                }
+            } catch (e: URISyntaxException) {
+            }
+            if (plugin == null) plugin = Bukkit.getPluginManager().plugins[0]
+            WORLD_GAME_MODE_CLASS = ReflectionUtil.getNMSClass("EnumGamemode")
+            if (WORLD_GAME_MODE_CLASS == null) WORLD_GAME_MODE_CLASS =
+                ReflectionUtil.getNMSClass("WorldSettings\$EnumGamemode")
+            CHAT_SERIALIZER = ReflectionUtil.getNMSClass("IChatBaseComponent\$ChatSerializer")
+            if (CHAT_SERIALIZER == null) CHAT_SERIALIZER = ReflectionUtil.getNMSClass("ChatSerializer")
+            PROPERTY = ReflectionUtil.getMojangAuthClass("properties.Property")
+            PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
+                PROPERTY, *arrayOf<Class<*>>(
+                    String::class.java, String::class.java, String::class.java
+                )
+            ).get() as Constructor<*>
+            if (PROPERTY == null || PROPERTY_CONSTRUCTOR == null) {
+                PROPERTY = ReflectionUtil.getOLDAuthlibClass("properties.Property")
+                PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
+                    PROPERTY, *arrayOf<Class<*>>(
+                        String::class.java, String::class.java, String::class.java
+                    )
+                ).get() as Constructor<*>
+            } else {
+                PROPERTY_MAP = ReflectionUtil.getMojangAuthClass("properties.PropertyMap")
+            }
+            WORLD_GAME_MODE_NOT_SET =
+                if (a()) ReflectionUtil.getEnumConstant(WORLD_GAME_MODE_CLASS, "NOT_SET") else null
+            PACKET_PLAYER_INFO_DATA_CONSTRUCTOR = if (a()) ReflectionUtil.getConstructor(
+                PACKET_PLAYER_INFO_DATA_CLASS, PACKET_PLAYER_INFO_CLASS, GAMEPROFILECLASS,
+                Int::class.javaPrimitiveType, WORLD_GAME_MODE_CLASS, I_CHAT_BASE_COMPONENT_CLASS
+            )
+                .get() as Constructor<*> else null
+            if (ReflectionUtil.isVersionHigherThan(1, 7)) {
+                try {
+                    PACKET_HEADER_FOOTER_CLASS = ReflectionUtil.getNMSClass("PacketPlayOutPlayerListHeaderFooter")
+                    PACKET_HEADER_FOOTER_CONSTRUCTOR = PACKET_HEADER_FOOTER_CLASS!!.constructors[0]
+                } catch (e: Exception) {
+                } catch (e: Error) {
+                }
             }
         }
     }
 
-    private final static String[] colorcodeOrder = "0123456789abcdef".split("");
-    private final static String[] inviscodeOrder = { ",", ".", "\'", "`", " " };
-
-    public static int SIZE_DEFAULT = 20;
-    public static int SIZE_TWO = 40;
-    public static int SIZE_THREE = 60;
-    public static int SIZE_FOUR = 80;
-
-    private List<Object> datas = new ArrayList<>();
-    private Map<Integer, String> datasOLD = new HashMap<Integer, String>();
-
-    private UUID ownerUUID;
-    private String[] tabs;
-    private boolean[] hasCustomTexture;
-    private int size = 0;
-
-    private static final HashMap<UUID, PlayerList> lookUpTable = new HashMap<>();
-
-    /**
-     * Due to the amount of times I have to check if a version is higher than 1.8,
-     * all reflection calls will be replace with this method.
-     *
-     * @param update
-     * @return
-     */
-    protected static boolean a(Integer... update) {
-        return ReflectionUtil.isVersionHigherThan(1, update.length > 0 ? update[0] : 8);
-    }
-
-    public void setHeaderFooter(String header, String footer) {
-        Object packet = ReflectionUtil.instantiate(PACKET_HEADER_FOOTER_CONSTRUCTOR);
-        ReflectionUtil.setInstanceField(packet, "a", invokeChatSerializerA(header));
-        ReflectionUtil.setInstanceField(packet, "b", invokeChatSerializerA(footer));
-        sendPacket(packet, Bukkit.getPlayer(this.ownerUUID));
-    }
-
-    /**
-     * Tries to return an existing table instance for a player. If one does not
-     * exist, it will create a new one with a default size.
-     *
-     * @param player
-     * @return null or the player's tablist.
-     */
-    public static PlayerList getPlayerList(Player player) {
-        if (!lookUpTable.containsKey(player.getUniqueId()))
-            return new PlayerList(player, SIZE_TWO);
-        return lookUpTable.get(player.getUniqueId());
-    }
-
-    public PlayerList(Player player, int size) {
-        lookUpTable.put(this.ownerUUID = player.getUniqueId(), this);
-        tabs = new String[80];
-        hasCustomTexture = new boolean[80];
-        this.size = size;
+    private val datas: MutableList<Any?> = ArrayList()
+    private val datasOLD: MutableMap<Int, String> = HashMap()
+    private var ownerUUID: UUID? = null
+    private val tabs: Array<String?>
+    private val hasCustomTexture: BooleanArray
+    private var size = 0
+    fun setHeaderFooter(header: String, footer: String) {
+        val packet = ReflectionUtil.instantiate(PACKET_HEADER_FOOTER_CONSTRUCTOR)
+        ReflectionUtil.setInstanceField(packet, "a", invokeChatSerializerA(header))
+        ReflectionUtil.setInstanceField(packet, "b", invokeChatSerializerA(footer))
+        sendPacket(
+            packet, Bukkit.getPlayer(
+                ownerUUID
+            )
+        )
     }
 
     /**
      * Returns the name of the tab at the index 'index'
      *
      * @param index
-     *            - the index of the entry in the tablist
+     * - the index of the entry in the tablist
      *
      * @return
      */
-    public String getTabName(int index) {
-        return tabs[index];
+    fun getTabName(index: Int): String? {
+        return tabs[index]
     }
 
     /**
      * Resets a player's tablist. Use this if you have want the tablist to return to
      * the base-minecraft tablist
      */
-    public void resetTablist() {
-        this.clearAll();
-        int i = 0;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            addExistingPlayer(i, player);
-            i++;
+    fun resetTablist() {
+        clearAll()
+        var i = 0
+        for (player in Bukkit.getOnlinePlayers()) {
+            addExistingPlayer(i, player)
+            i++
         }
     }
 
     /**
      * Clears all players from the player's tablist.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void clearPlayers() {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
+    fun clearPlayers() {
+        val packet =
+            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
+            val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
+            val olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null)
 
-        if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
+            var olpa: Array<Player>
 
-            Object olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null);
-            Object[] olpa;
-            if (olp instanceof Collection)
-                olpa = ((Collection) olp).toArray();
-            else
-                olpa = ((Player[]) olp);
-
-            for (Object player2 : olpa) {
-                Player player = (Player) player2;
-                Object gameProfile = GAMEPROFILECLASS
-                        .cast(ReflectionUtil.invokeMethod(player, "getProfile", new Class[0]));
-                Object[] array = (Object[]) ReflectionUtil.invokeMethod(CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
-                        new Class[] { String.class }, player.getName());
-                Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                        WORLD_GAME_MODE_NOT_SET, array[0]);
-                players.add(data);
+            if (olp is Collection<*>) {
+                olpa = (olp as Collection<Player>).toTypedArray()
+            } else {
+                olpa = olp as Array<Player>
             }
-            sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+
+            for (player2 in olpa) {
+                val player = player2
+                val gameProfile = GAMEPROFILECLASS?.cast(
+                    ReflectionUtil.invokeMethod(
+                        player,
+                        "getProfile",
+                        arrayOfNulls<Class<*>?>(0)
+                    )
+                )
+                val array = ReflectionUtil.invokeMethod(
+                    CRAFT_CHAT_MESSAGE_CLASS, null, "fromString", arrayOf(
+                        String::class.java
+                    ), player.name
+                ) as Array<Any>?
+                val data = ReflectionUtil.instantiate(
+                    PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
+                    WORLD_GAME_MODE_NOT_SET, array!![0]
+                )
+                players!!.add(data)
+            }
+            sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER)
         } else {
-            Object olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null);
-            Object[] players = olp instanceof Collection ? ((Collection<?>) olp).toArray() : (Object[]) olp;
-            for (int i = 0; i < players.length; i++) {
+            val olp = ReflectionUtil.invokeMethod(Bukkit.getServer(), "getOnlinePlayers", null)
+
+            val players: Array<Player> = if (olp is Collection<*>) {
+                (olp as Collection<Player>).toTypedArray()
+            } else olp as Array<Player>
+
+            for (i in players.indices) {
                 try {
-                    Object packetLoop = ReflectionUtil.instantiate(
-                            (Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-                    sendOLDTabPackets(getPlayer(), packetLoop, ((Player) players[i]).getName(), false);
-                } catch (Exception e) {
-                    error();
-                    e.printStackTrace();
+                    val packetLoop = ReflectionUtil.instantiate(
+                        ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>
+                    )
+                    sendOLDTabPackets(player, packetLoop, players[i].name, false)
+                } catch (e: Exception) {
+                    error()
+                    e.printStackTrace()
                 }
             }
         }
@@ -279,32 +359,32 @@ public class PlayerList {
     /**
      * Clears all the custom tabs from the player's tablist.
      */
-    @SuppressWarnings("unchecked")
-    public void clearCustomTabs() {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-
-        if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
-            for (Object playerData : new ArrayList<>(datas))
-                tabs[getIDFromName((String) ReflectionUtil.invokeMethod(
-                        GAMEPROFILECLASS.cast(ReflectionUtil.invokeMethod(playerData, "a", new Class[0])), "getName",
-                        null))] = "";
-            players.addAll(datas);
-            datas.clear();
-            sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+    fun clearCustomTabs() {
+        val packet =
+            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
+            val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
+            for (playerData in ArrayList(datas)) tabs[getIDFromName(
+                ReflectionUtil.invokeMethod(
+                    GAMEPROFILECLASS!!.cast(ReflectionUtil.invokeMethod(playerData, "a", arrayOfNulls<Class<*>?>(0))),
+                    "getName",
+                    null
+                ) as String?
+            )] = ""
+            players!!.addAll(datas)
+            datas.clear()
+            sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER)
         } else {
-            for (int i = 0; i < size; i++)
-                if (datasOLD.containsKey(i))
-                    try {
-                        Object packetLoop = ReflectionUtil.instantiate(
-                                (Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-                        sendOLDTabPackets(getPlayer(), packetLoop, datasOLD.get(i), false);
-                        tabs[i] = null;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-            datasOLD.clear();
+            for (i in 0 until size) if (datasOLD.containsKey(i)) try {
+                val packetLoop = ReflectionUtil.instantiate(
+                    ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>
+                )
+                sendOLDTabPackets(player, packetLoop, datasOLD[i], false)
+                tabs[i] = null
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            datasOLD.clear()
         }
     }
 
@@ -316,57 +396,47 @@ public class PlayerList {
      * "clearCustomTabs" method. If you do not, the player will continue to see the
      * custom tabs until they relog.
      */
-    public void clearAll() {
-        clearPlayers();
-        clearCustomTabs();
+    fun clearAll() {
+        clearPlayers()
+        clearCustomTabs()
     }
-
     /**
      * Use this for changing a value at a specific tab.
      *
      * @param id
      * @param newName
      */
-    public void updateSlot(int id, String newName) {
-        updateSlot(id, newName, false);
-    }
-
     /**
      * Use this for changing a value at a specific tab.
      *
      * @param id
      * @param newName
      */
-    public void updateSlot(int id, String newName, UUID uuid) {
-        updateSlot(id, newName, uuid, false);
+    @JvmOverloads
+    fun updateSlot(id: Int, newName: String, usePlayersSkin: Boolean = false) {
+        updateSlot(id, newName, UUID.randomUUID(), usePlayersSkin)
     }
-
     /**
      * Use this for changing a value at a specific tab.
      *
      * @param id
      * @param newName
      */
-    public void updateSlot(int id, String newName, boolean usePlayersSkin) {
-        updateSlot(id, newName, UUID.randomUUID(), usePlayersSkin);
-    }
-
     /**
      * Use this for changing a value at a specific tab.
      *
      * @param id
      * @param newName
      */
-    public void updateSlot(int id, String newName, UUID uuid, boolean usePlayersSkin) {
+    @JvmOverloads
+    fun updateSlot(id: Int, newName: String, uuid: UUID, usePlayersSkin: Boolean = false) {
         if (a()) {
-            removeCustomTab(id, true);
-            addValue(id, newName, uuid, usePlayersSkin);
-            hasCustomTexture[id] = usePlayersSkin;
+            removeCustomTab(id, true)
+            addValue(id, newName, uuid, usePlayersSkin)
+            hasCustomTexture[id] = usePlayersSkin
         } else {
-            for (int i = id; i < size; i++)
-                removeCustomTab(i, false);
-            for (int i = id; i < size; i++)
-                addValue(i, (i == id) ? newName : datasOLD.get(i).substring(2), false);
+            for (i in id until size) removeCustomTab(i, false)
+            for (i in id until size) addValue(i, if (i == id) newName else datasOLD[i]!!.substring(2), false)
             // This is for pre 1.8, no textures needed
         }
     }
@@ -376,25 +446,30 @@ public class PlayerList {
      *
      * @param player
      */
-    @SuppressWarnings("unchecked")
-    public void removePlayer(Player player) {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-        if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
-            Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil.invokeMethod(player, "getProfile", new Class[0]));
-            Object[] array = (Object[]) ReflectionUtil.invokeMethod(CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
-                    new Class[] { String.class }, player.getName());
-            Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                    WORLD_GAME_MODE_NOT_SET, array[0]);
-            players.add(data);
-            sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+    fun removePlayer(player: Player) {
+        val packet =
+            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
+            val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
+            val gameProfile =
+                GAMEPROFILECLASS!!.cast(ReflectionUtil.invokeMethod(player, "getProfile", arrayOfNulls<Class<*>?>(0)))
+            val array = ReflectionUtil.invokeMethod(
+                CRAFT_CHAT_MESSAGE_CLASS, null, "fromString", arrayOf(
+                    String::class.java
+                ), player.name
+            ) as Array<Any>?
+            val data = ReflectionUtil.instantiate(
+                PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
+                WORLD_GAME_MODE_NOT_SET, array!![0]
+            )
+            players!!.add(data)
+            sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER)
         } else {
             try {
-                sendOLDTabPackets(player, packet, player.getName(), false);
-            } catch (Exception e) {
-                error();
-                e.printStackTrace();
+                sendOLDTabPackets(player, packet, player.name, false)
+            } catch (e: Exception) {
+                error()
+                e.printStackTrace()
             }
         }
     }
@@ -404,8 +479,8 @@ public class PlayerList {
      *
      * @param id
      */
-    public void removeCustomTab(int id) {
-        removeCustomTab(id, true);
+    fun removeCustomTab(id: Int) {
+        removeCustomTab(id, true)
     }
 
     /**
@@ -413,34 +488,33 @@ public class PlayerList {
      *
      * @param id
      */
-    @SuppressWarnings("unchecked")
-    private void removeCustomTab(int id, boolean remove) {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-        if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
-            for (Object playerData : new ArrayList<>(datas)) {
-                Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil.invokeMethod(playerData, "a", new Class[0]));
-                String getname = (String) ReflectionUtil.invokeMethod(gameProfile, "getName", null);
-                if (getname.startsWith(getNameFromID(id))) {
-                    tabs[getIDFromName(getname)] = "";
-                    players.add(playerData);
-                    if (remove)
-                        datas.remove(playerData);
-                    break;
+    private fun removeCustomTab(id: Int, remove: Boolean) {
+        val packet =
+            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
+            val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
+            for (playerData in ArrayList(datas)) {
+                val gameProfile =
+                    GAMEPROFILECLASS!!.cast(ReflectionUtil.invokeMethod(playerData, "a", arrayOfNulls<Class<*>?>(0)))
+                val getname = ReflectionUtil.invokeMethod(gameProfile, "getName", null) as String?
+                if (getname!!.startsWith(getNameFromID(id))) {
+                    tabs[getIDFromName(getname)] = ""
+                    players!!.add(playerData)
+                    if (remove) datas.remove(playerData)
+                    break
                 }
             }
-            sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+            sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER)
         } else {
             try {
-                sendOLDTabPackets(getPlayer(), packet, datasOLD.get(id), false);
+                sendOLDTabPackets(player, packet, datasOLD[id], false)
                 if (remove) {
-                    tabs[id] = null;
-                    datasOLD.remove(id);
+                    tabs[id] = null
+                    datasOLD.remove(id)
                 }
-            } catch (Exception e) {
-                error();
-                e.printStackTrace();
+            } catch (e: Exception) {
+                error()
+                e.printStackTrace()
             }
         }
     }
@@ -455,8 +529,8 @@ public class PlayerList {
      * @param name
      * @param player
      */
-    public void addExistingPlayer(int id, String name, OfflinePlayer player) {
-        addValue(id, name, player.getUniqueId(), true);
+    fun addExistingPlayer(id: Int, name: String, player: OfflinePlayer) {
+        addValue(id, name, player.uniqueId, true)
     }
 
     /**
@@ -466,8 +540,8 @@ public class PlayerList {
      * @param id
      * @param player
      */
-    public void addExistingPlayer(int id, OfflinePlayer player) {
-        addExistingPlayer(id, player.getName(), player);
+    fun addExistingPlayer(id: Int, player: OfflinePlayer) {
+        addExistingPlayer(id, player.name, player)
     }
 
     /**
@@ -475,16 +549,18 @@ public class PlayerList {
      *
      * @param id
      * @param name
-     * @deprecated If all 80 slots have been taken, new values will not be shown and
-     *             may have the potential to go out of the registered bounds. Use
-     *             the "updateSlot" method to change a slot.
      */
-    @Deprecated
-    private void addValue(int id, String name, boolean shouldUseSkin) {
-        UUID uuid = (name.length() > 0 && Bukkit.getOfflinePlayer(name).hasPlayedBefore())
-                ? Bukkit.getOfflinePlayer(name).getUniqueId()
-                : UUID.randomUUID();
-        this.addValue(id, name, uuid, shouldUseSkin);
+    @Deprecated("")
+//        (
+//        """If all 80 slots have been taken, new values will not be shown and
+//                  may have the potential to go out of the registered bounds. Use
+//                  the """ updateSlot() " method to change a slot."
+//    )
+    private fun addValue(id: Int, name: String, shouldUseSkin: Boolean) {
+        val uuid = if (name.length > 0 && Bukkit.getOfflinePlayer(name)
+                .hasPlayedBefore()
+        ) Bukkit.getOfflinePlayer(name).uniqueId else UUID.randomUUID()
+        this.addValue(id, name, uuid, shouldUseSkin)
     }
 
     /**
@@ -492,71 +568,88 @@ public class PlayerList {
      *
      * @param id
      * @param name
-     * @deprecated If all 80 slots have been taken, new values will not be shown and
-     *             may have the potential to go out of the registered bounds. Use
-     *             the "updateSlot" method to change a slot.
      */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    private void addValue(int id, String name, UUID uuid, boolean updateProfToAddCustomSkin) {
-        Object packet = ReflectionUtil
-                .instantiate((Constructor<?>) ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get());
-        if (ReflectionUtil.getInstanceField(packet, "b") instanceof List) {
-            List<Object> players = (List<Object>) ReflectionUtil.getInstanceField(packet, "b");
-            Object gameProfile = Bukkit.getPlayer(uuid) != null
-                    ? ReflectionUtil.invokeMethod(getHandle(Bukkit.getPlayer(uuid)), "getProfile", new Class[0])
-                    : ReflectionUtil.instantiate(GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id) + name);
-            Object[] array = (Object[]) ReflectionUtil.invokeMethod(CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
-                    new Class[] { String.class }, getNameFromID(id) + name);
-            Object data = ReflectionUtil.instantiate(PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
-                    WORLD_GAME_MODE_NOT_SET, array[0]);
-            SkinCallBack call = new SkinCallBack() {
-                @Override
-                public void callBack(Skin skin, boolean successful, Exception exception) {
-                    Object profile = GAMEPROFILECLASS.cast(ReflectionUtil.invokeMethod(data, "a", new Class[0]));
+    @Deprecated("")
+//        (
+//        """If all 80 slots have been taken, new values will not be shown and
+//                  may have the potential to go out of the registered bounds. Use
+//                  the """ updateSlot() " method to change a slot."
+//    )
+    private fun addValue(id: Int, name: String, uuid: UUID, updateProfToAddCustomSkin: Boolean) {
+        val packet =
+            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
+            val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
+            val gameProfile = if (Bukkit.getPlayer(uuid) != null) ReflectionUtil.invokeMethod(
+                getHandle(Bukkit.getPlayer(uuid)),
+                "getProfile",
+                arrayOfNulls<Class<*>?>(0)
+            ) else ReflectionUtil.instantiate(
+                GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id) + name
+            )
+            val array = ReflectionUtil.invokeMethod(
+                CRAFT_CHAT_MESSAGE_CLASS, null, "fromString", arrayOf(
+                    String::class.java
+                ), getNameFromID(id) + name
+            ) as Array<Any>?
+            val data = ReflectionUtil.instantiate(
+                PACKET_PLAYER_INFO_DATA_CONSTRUCTOR, packet, gameProfile, 1,
+                WORLD_GAME_MODE_NOT_SET, array!![0]
+            )
+            val call: SkinCallBack = object : SkinCallBack {
+                override fun callBack(skin: Skin?, successful: Boolean, exception: Exception?) {
+                    val profile =
+                        GAMEPROFILECLASS!!.cast(ReflectionUtil.invokeMethod(data, "a", arrayOfNulls<Class<*>?>(0)))
                     if (successful) {
                         try {
-                            Object map = ReflectionUtil.invokeMethod(profile, "getProperties", new Class[0]);
-                            if (skin.getBase64() != null && skin.getSignedBase64() != null) {
+                            val map = ReflectionUtil.invokeMethod(profile, "getProperties", arrayOfNulls<Class<*>?>(0))
+                            if (skin!!.base64 != null && skin.signedBase64 != null) {
                                 if (!ReflectionUtil.isVersionHigherThan(1, 13)) {
-                                    ReflectionUtil.invokeMethod(map, "removeAll", new Class[] { String.class },
-                                            "textures");
+                                    ReflectionUtil.invokeMethod(
+                                        map, "removeAll", arrayOf(
+                                            String::class.java
+                                        ),
+                                        "textures"
+                                    )
                                 } else {
-                                    ReflectionUtil.invokeMethod(map, "removeAll", new Class[] { Object.class },
-                                            "textures");
+                                    ReflectionUtil.invokeMethod(
+                                        map, "removeAll", arrayOf(
+                                            Any::class.java
+                                        ),
+                                        "textures"
+                                    )
                                 }
-                                Object prop = ReflectionUtil.instantiate(PROPERTY_CONSTRUCTOR, "textures",
-                                        skin.getBase64(), skin.getSignedBase64());
-                                Method m = null;
-                                for (Method mm : PROPERTY_MAP.getMethods())
-                                    if (mm.getName().equals("put"))
-                                        m = mm;
+                                val prop = ReflectionUtil.instantiate(
+                                    PROPERTY_CONSTRUCTOR, "textures",
+                                    skin.base64, skin.signedBase64
+                                )
+                                var m: Method? = null
+                                for (mm in PROPERTY_MAP!!.methods) if (mm.name == "put") m = mm
                                 try {
-                                    if (m != null)
-                                        m.invoke(map, "textures", prop);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                    m?.invoke(map, "textures", prop)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
                             }
-                        } catch (Error e) {
+                        } catch (e: Error) {
                         }
                     }
-                    String getname = (String) ReflectionUtil.invokeMethod(profile, "getName", null);
-                    tabs[getIDFromName(getname)] = getname;
-                    players.add(data);
-                    datas.add(data);
-                    sendNEWTabPackets(getPlayer(), packet, players, PACKET_PLAYER_INFO_ACTION_ADD_PLAYER);
+                    val getname = ReflectionUtil.invokeMethod(profile, "getName", null) as String?
+                    tabs[getIDFromName(getname)] = getname
+                    players!!.add(data)
+                    datas.add(data)
+                    sendNEWTabPackets(player, packet, players, PACKET_PLAYER_INFO_ACTION_ADD_PLAYER)
                 }
-            };
+            }
             if (updateProfToAddCustomSkin) {
-                Skin.getSkin(name, call);
+                Skin.getSkin(name, call)
             } else {
-                Skin.getSkin("aaa", call);
+                Skin.getSkin("aaa", call)
             }
         } else {
-            sendOLDTabPackets(getPlayer(), packet, getNameFromID(id) + name, true);
-            tabs[id] = name;
-            datasOLD.put(id, getNameFromID(id) + name);
+            sendOLDTabPackets(player, packet, getNameFromID(id) + name, true)
+            tabs[id] = name
+            datasOLD[id] = getNameFromID(id) + name
         }
     }
 
@@ -565,44 +658,9 @@ public class PlayerList {
      * then this should be called right after the playlist instance has been
      * created.
      */
-    public void initTable() {
-        clearAll();
-        for (int i = 0; i < size; i++)
-            updateSlot(i, "", false);
-    }
-
-    private static void sendNEWTabPackets(Player player, Object packet, List<?> players, Object action) {
-        try {
-            ReflectionUtil.setInstanceField(packet, "a", action);
-            ReflectionUtil.setInstanceField(packet, "b", players);
-            sendPacket(packet, player);
-        } catch (Exception e) {
-            error();
-            e.printStackTrace();
-        }
-
-    }
-
-    private static void sendOLDTabPackets(Player player, Object packet, String name, boolean isOnline) {
-        try {
-            ReflectionUtil.setInstanceField(packet, "a", name);
-            ReflectionUtil.setInstanceField(packet, "b", isOnline);
-            ReflectionUtil.setInstanceField(packet, "c", ((short) 0));
-            sendPacket(packet, player);
-        } catch (Exception e) {
-            error();
-            e.printStackTrace();
-        }
-    }
-
-    private static void sendPacket(Object packet, Player player) {
-        Object handle = getHandle(player);
-        Object playerConnection = ReflectionUtil.getInstanceField(handle, "playerConnection");
-        ReflectionUtil.invokeMethod(playerConnection, "sendPacket", new Class[] { PACKET_CLASS }, packet);
-    }
-
-    private static Object getHandle(Player player) {
-        return ReflectionUtil.invokeMethod(CRAFTPLAYERCLASS.cast(player), "getHandle", new Class[0]);
+    fun initTable() {
+        clearAll()
+        for (i in 0 until size) updateSlot(i, "", false)
     }
 
     /**
@@ -610,9 +668,8 @@ public class PlayerList {
      *
      * @return the player (if they are online), or null (if they are offline)
      */
-    public Player getPlayer() {
-        return Bukkit.getPlayer(this.ownerUUID);
-    }
+    val player: Player
+        get() = Bukkit.getPlayer(ownerUUID)
 
     /**
      * This returns the ID of a slot at [Row,Columb].
@@ -622,97 +679,54 @@ public class PlayerList {
      *
      * @return
      */
-    public int getID(int row, int col) {
-        return (col * 20) + row;
+    fun getID(row: Int, col: Int): Int {
+        return col * 20 + row
     }
 
-    private static String getNameFromID(int id) {
-        String[] a = colorcodeOrder;
-        int size1 = 15;
-        if (!a()) {
-            a = inviscodeOrder;
-            size1 = 5;
-        }
-        String firstletter = a[id / size1];
-        String secondletter = a[id % size1];
-        if (a())
-            return ChatColor.getByChar(firstletter) + "" + ChatColor.getByChar(secondletter) + ChatColor.RESET;
-        return firstletter + secondletter;
-    }
-
-    private static int getIDFromName(String id) {
-        String[] a = colorcodeOrder;
-        int size1 = 15;
-        int indexAdder = 0;
-        if (!a()) {
-            a = inviscodeOrder;
-            size1 = 5;
-            indexAdder = 1;
-        }
-        int total = 0;
-        for (int i = 0; i < a.length; i++) {
-            if (a[i].equalsIgnoreCase(id.charAt(0 + indexAdder) + "")) {
-                total = size1 * i;
-                break;
-            }
-        }
-        for (int i = 0; i < a.length; i++) {
-            if (a[i].equalsIgnoreCase(id.charAt(1 + (indexAdder + indexAdder)) + "")) {
-                total += i;
-                break;
-            }
-        }
-        return total;
-    }
-
-    private static void error() {
-        Bukkit.broadcastMessage("PLEASE REPORT THIS ISSUE TO" + ChatColor.RED + " ZOMBIE_STRIKER" + ChatColor.RESET
-                + " ON THE BUKKIT FORUMS");
+    init {
+        lookUpTable[player.uniqueId.also {
+            ownerUUID = it
+        }] = this
+        tabs = arrayOfNulls(80)
+        hasCustomTexture = BooleanArray(80)
+        this.size = size
     }
 }
 
 /**
  * A small help with reflection
  */
-class ReflectionUtil {
-    protected static final String SERVER_VERSION;
-    static {
-        String name = Bukkit.getServer().getClass().getName();
-        name = name.substring(name.indexOf("craftbukkit.") + "craftbukkit.".length());
-        name = name.substring(0, name.indexOf("."));
-        SERVER_VERSION = name;
-    }
+internal object ReflectionUtil {
+    private lateinit var SERVER_VERSION: String
 
-    protected static boolean isVersionHigherThan(int mainVersion, int secondVersion) {
-        String firstChar = SERVER_VERSION.substring(1, 2);
-        int fInt = Integer.parseInt(firstChar);
-        if (fInt < mainVersion)
-            return false;
-        StringBuilder secondChar = new StringBuilder();
-        for (int i = 3; i < 10; i++) {
-            if (SERVER_VERSION.charAt(i) == '_' || SERVER_VERSION.charAt(i) == '.')
-                break;
-            secondChar.append(SERVER_VERSION.charAt(i));
+    fun isVersionHigherThan(mainVersion: Int, secondVersion: Int): Boolean {
+        val firstChar = SERVER_VERSION.substring(1, 2)
+        val fInt = firstChar.toInt()
+        if (fInt < mainVersion) return false
+        val secondChar = StringBuilder()
+
+        for (i in 3..9) {
+            if (SERVER_VERSION[i] == '_' || SERVER_VERSION[i] == '.') break
+            secondChar.append(SERVER_VERSION[i])
         }
-        int sInt = Integer.parseInt(secondChar.toString());
-        if (sInt < secondVersion)
-            return false;
-        return true;
+
+        val sInt = secondChar.toString().toInt()
+        return if (sInt < secondVersion) false else true
     }
 
     /**
      * Returns the NMS class.
      *
      * @param name
-     *            The name of the class
+     * The name of the class
      *
      * @return The NMS class or null if an error occurred
      */
-    protected static Class<?> getNMSClass(String name) {
-        try {
-            return Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name);
-        } catch (ClassNotFoundException e) {
-            return null;
+    fun getNMSClass(name: String): Class<*>? {
+        return try {
+            Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name)
+        } catch (e: ClassNotFoundException) {
+            null
         }
     }
 
@@ -720,15 +734,15 @@ class ReflectionUtil {
      * Returns the NMS class.
      *
      * @param name
-     *            The name of the class
+     * The name of the class
      *
      * @return The NMS class or null if an error occurred
      */
-    protected static Class<?> getOLDAuthlibClass(String name) {
-        try {
-            return Class.forName("net.minecraft.util.com.mojang.authlib." + name);
-        } catch (ClassNotFoundException e) {
-            return null;
+    fun getOLDAuthlibClass(name: String): Class<*>? {
+        return try {
+            Class.forName("net.minecraft.util.com.mojang.authlib.$name")
+        } catch (e: ClassNotFoundException) {
+            null
         }
     }
 
@@ -736,16 +750,15 @@ class ReflectionUtil {
      * Returns the CraftBukkit class.
      *
      * @param name
-     *            The name of the class
+     * The name of the class
      *
      * @return The CraftBukkit class or null if an error occurred
      */
-
-    protected static Class<?> getCraftbukkitClass(String name, String packageName) {
-        try {
-            return Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + packageName + "." + name);
-        } catch (ClassNotFoundException e) {
-            return null;
+    fun getCraftbukkitClass(name: String, packageName: String): Class<*>? {
+        return try {
+            Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + packageName + "." + name)
+        } catch (e: ClassNotFoundException) {
+            null
         }
     }
 
@@ -753,20 +766,19 @@ class ReflectionUtil {
      * Returns the mojang.authlib class.
      *
      * @param name
-     *            The name of the class
+     * The name of the class
      *
      * @return The mojang.authlib class or null if an error occurred
      */
-
-    protected static Class<?> getMojangAuthClass(String name) {
-        try {
+    fun getMojangAuthClass(name: String): Class<*>? {
+        return try {
             if (PlayerList.a()) {
-                return Class.forName("com.mojang.authlib." + name);
+                Class.forName("com.mojang.authlib.$name")
             } else {
-                return Class.forName("net.minecraft.util.com.mojang.authlib." + name);
+                Class.forName("net.minecraft.util.com.mojang.authlib.$name")
             }
-        } catch (ClassNotFoundException e) {
-            return null;
+        } catch (e: ClassNotFoundException) {
+            null
         }
     }
 
@@ -774,76 +786,75 @@ class ReflectionUtil {
      * Invokes the method
      *
      * @param handle
-     *            The handle to invoke it on
+     * The handle to invoke it on
      * @param methodName
-     *            The name of the method
+     * The name of the method
      * @param parameterClasses
-     *            The parameter types
+     * The parameter types
      * @param args
-     *            The arguments
+     * The arguments
      *
      * @return The resulting object or null if an error occurred / the method didn't
-     *         return a thing
+     * return a thing
      */
-    @SuppressWarnings("rawtypes")
-    protected static Object invokeMethod(Object handle, String methodName, Class[] parameterClasses, Object... args) {
-        return invokeMethod(handle.getClass(), handle, methodName, parameterClasses, args);
+    fun invokeMethod(handle: Any?, methodName: String?, parameterClasses: Array<Class<*>?>?, vararg args: Any?): Any? {
+        return invokeMethod(handle!!.javaClass, handle, methodName, parameterClasses, *args)
     }
 
     /**
      * Invokes the method
      *
      * @param clazz
-     *            The class to invoke it from
+     * The class to invoke it from
      * @param handle
-     *            The handle to invoke it on
+     * The handle to invoke it on
      * @param methodName
-     *            The name of the method
+     * The name of the method
      * @param parameterClasses
-     *            The parameter types
+     * The parameter types
      * @param args
-     *            The arguments
+     * The arguments
      *
      * @return The resulting object or null if an error occurred / the method didn't
-     *         return a thing
+     * return a thing
      */
-    @SuppressWarnings("rawtypes")
-    protected static Object invokeMethod(Class<?> clazz, Object handle, String methodName, Class[] parameterClasses,
-                                         Object... args) {
-        Optional<Method> methodOptional = getMethod(clazz, methodName, parameterClasses);
-        if (!methodOptional.isPresent())
-            return null;
-        Method method = methodOptional.get();
+    fun invokeMethod(
+        clazz: Class<*>?, handle: Any?, methodName: String?, parameterClasses: Array<Class<*>?>?,
+        vararg args: Any?
+    ): Any? {
+        val methodOptional = getMethod(clazz, methodName, *parameterClasses!!)
+        if (!methodOptional.isPresent) return null
+        val method = methodOptional.get()
         try {
-            return method.invoke(handle, args);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            return method.invoke(handle, *args)
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        } catch (e: InvocationTargetException) {
+            e.printStackTrace()
         }
-        return null;
+        return null
     }
 
     /**
      * Sets the value of an instance field
      *
      * @param handle
-     *            The handle to invoke it on
+     * The handle to invoke it on
      * @param name
-     *            The name of the field
+     * The name of the field
      * @param value
-     *            The new value of the field
+     * The new value of the field
      */
-    protected static void setInstanceField(Object handle, String name, Object value) {
-        Class<?> clazz = handle.getClass();
-        Optional<Field> fieldOptional = getField(clazz, name);
-        if (!fieldOptional.isPresent())
-            return;
-        Field field = fieldOptional.get();
-        if (!field.isAccessible())
-            field.setAccessible(true);
+    fun setInstanceField(handle: Any?, name: String?, value: Any?) {
+        val clazz: Class<*> = handle!!.javaClass
+        val fieldOptional = getField(clazz, name)
+        if (!fieldOptional.isPresent) return
+        val field = fieldOptional.get()
+        if (!field.isAccessible) field.isAccessible = true
         try {
-            field.set(handle, value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            field[handle] = value
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
         }
     }
 
@@ -851,118 +862,124 @@ class ReflectionUtil {
      * Sets the value of an instance field
      *
      * @param handle
-     *            The handle to invoke it on
+     * The handle to invoke it on
      * @param name
-     *            The name of the field
+     * The name of the field
      *
      * @return The result
      */
-    protected static Object getInstanceField(Object handle, String name) {
-        Class<?> clazz = handle.getClass();
-        Optional<Field> fieldOptional = getField(clazz, name);
-        if (!fieldOptional.isPresent())
-            return handle;
-        Field field = fieldOptional.get();
-        if (!field.isAccessible())
-            field.setAccessible(true);
+    fun getInstanceField(handle: Any?, name: String?): Any? {
+        val clazz: Class<*> = handle!!.javaClass
+        val fieldOptional = getField(clazz, name)
+        if (!fieldOptional.isPresent) return handle
+        val field = fieldOptional.get()
+        if (!field.isAccessible) field.isAccessible = true
         try {
-            return field.get(handle);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            return field[handle]
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
         }
-        return null;
+        return null
     }
 
     /**
      * Returns an enum constant
      *
      * @param enumClass
-     *            The class of the enum
+     * The class of the enum
      * @param name
-     *            The name of the enum constant
+     * The name of the enum constant
      *
      * @return The enum entry or null
      */
-    protected static Object getEnumConstant(Class<?> enumClass, String name) {
-        if (!enumClass.isEnum())
-            return null;
-        for (Object o : enumClass.getEnumConstants())
-            if (name.equals(invokeMethod(o, "name", new Class[0])))
-                return o;
-        return null;
+    fun getEnumConstant(enumClass: Class<*>?, name: String): Any? {
+        if (!enumClass!!.isEnum) return null
+        for (o in enumClass.enumConstants) if (name == invokeMethod(o, "name", arrayOfNulls<Class<*>?>(0))) return o
+        return null
     }
 
     /**
      * Returns the constructor
      *
      * @param clazz
-     *            The class
+     * The class
      * @param params
-     *            The Constructor parameters
+     * The Constructor parameters
      *
      * @return The Constructor or an empty Optional if there is none with these
-     *         parameters
+     * parameters
      */
-    protected static Optional<?> getConstructor(Class<?> clazz, Class<?>... params) {
+    fun getConstructor(clazz: Class<*>?, vararg params: Class<*>?): Optional<*> {
         try {
-            return Optional.of(clazz.getConstructor(params));
-        } catch (NoSuchMethodException e) {
+            return Optional.of(clazz!!.getConstructor(*params))
+        } catch (e: NoSuchMethodException) {
             try {
-                return Optional.of(clazz.getDeclaredConstructor(params));
-            } catch (NoSuchMethodException e2) {
-                e2.printStackTrace();
+                return Optional.of(clazz!!.getDeclaredConstructor(*params))
+            } catch (e2: NoSuchMethodException) {
+                e2.printStackTrace()
             }
         }
-        return Optional.empty();
+        return Optional.empty<Any>()
     }
 
     /**
      * Instantiates the class. Will print the errors it gets
      *
      * @param constructor
-     *            The constructor
+     * The constructor
      * @param arguments
-     *            The initial arguments
+     * The initial arguments
      *
      * @return The resulting object, or null if an error occurred.
      */
-    protected static Object instantiate(Constructor<?> constructor, Object... arguments) {
+    fun instantiate(constructor: Constructor<*>?, vararg arguments: Any?): Any? {
         try {
-            return constructor.newInstance(arguments);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return constructor!!.newInstance(*arguments)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return null;
+        return null
     }
 
-    protected static Optional<Method> getMethod(Class<?> clazz, String name, Class<?>... params) {
+    internal fun getMethod(clazz: Class<*>?, name: String?, vararg params: Class<*>?): Optional<Method> {
         try {
-            return Optional.of(clazz.getMethod(name, params));
-        } catch (NoSuchMethodException e) {
+            return Optional.of(clazz!!.getMethod(name, *params))
+        } catch (e: NoSuchMethodException) {
             try {
-                return Optional.of(clazz.getDeclaredMethod(name, params));
-            } catch (NoSuchMethodException e2) {
-                e2.printStackTrace();
+                return Optional.of(clazz!!.getDeclaredMethod(name, *params))
+            } catch (e2: NoSuchMethodException) {
+                e2.printStackTrace()
             }
         }
-        return Optional.empty();
+        return Optional.empty()
     }
 
-    protected static Optional<Field> getField(Class<?> clazz, String name) {
+    internal fun getField(clazz: Class<*>, name: String?): Optional<Field> {
         try {
-            return Optional.of(clazz.getField(name));
-        } catch (NoSuchFieldException e) {
+            return Optional.of(clazz.getField(name))
+        } catch (e: NoSuchFieldException) {
             try {
-                return Optional.of(clazz.getDeclaredField(name));
-            } catch (NoSuchFieldException e2) {
+                return Optional.of(clazz.getDeclaredField(name))
+            } catch (e2: NoSuchFieldException) {
             }
         }
-        return Optional.empty();
+        return Optional.empty()
+    }
+
+    init {
+        val name = Bukkit.getServer().javaClass.name
+
+        SERVER_VERSION = name.substring(
+            name.indexOf("craftbukkit.") + "craftbukkit.".length
+        ).substring(
+            0,
+            name.indexOf(".")
+        )
     }
 }
 
-interface SkinCallBack {
-    void callBack(Skin skin, boolean successful, Exception exception);
+internal interface SkinCallBack {
+    fun callBack(skin: Skin?, successful: Boolean, exception: Exception?)
 }
 
 /**
@@ -977,281 +994,263 @@ interface SkinCallBack {
  *
  * @author AlvinB
  */
-class Skin implements ConfigurationSerializable {
+internal class Skin : ConfigurationSerializable {
+    companion object {
+        // Access to this must be asynchronous!
+        // private static final LoadingCache<UUID, Skin> SKIN_CACHE = CacheBuilder
+        var SKIN_CACHE: Any? = null
+        var callbacksUUID: MutableMap<UUID, String> = HashMap()
+        var callbacks: MutableMap<String?, MutableList<SkinCallBack>> = HashMap()
 
-    // Access to this must be asynchronous!
-    // private static final LoadingCache<UUID, Skin> SKIN_CACHE = CacheBuilder
-    public static Object SKIN_CACHE;
-
-    // private static boolean skin_Enabled = false;
-
-    static {
-        try {
-            SKIN_CACHE = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
-                    .build(new CacheLoader<UUID, Skin>() {
-                        @Override
-                        public Skin load(UUID uuid) throws Exception {
-                            MojangAPIUtil.Result<MojangAPIUtil.SkinData> result = MojangAPIUtil.getSkinData(uuid);
-                            if (result.wasSuccessful()) {
-                                if (result.getValue() != null) {
-                                    MojangAPIUtil.SkinData data = result.getValue();
-                                    if (data.getSkinURL() == null && data.getCapeURL() == null) {
-                                        return Skin.EMPTY_SKIN;
+        /**
+         * Gets the skin for a username.
+         *
+         *
+         * Since fetching this skin requires making asynchronous requests to Mojang's
+         * servers, a call back mechanism using the SkinCallBack class is implemented.
+         * This call back allows you to also handle any errors that might have occurred
+         * while fetching the skin. If no users with the specified username can be
+         * found, the skin passed to the callback will be Skin.EMPTY_SKIN.
+         *
+         *
+         * The call back will always be fired on the main thread.
+         *
+         * @param username
+         * the username to get the skin of
+         * @param callBack
+         * the call back to handle the result of the request
+         */
+        fun getSkin(username: String, callBack: SkinCallBack) {
+            var newcall = false
+            if (!callbacks.containsKey(username)) {
+                callbacks[username] = ArrayList()
+                newcall = true
+            }
+            callbacks[username]!!.add(callBack)
+            if (newcall) {
+                object : BukkitRunnable() {
+                    var u = username
+                    override fun run() {
+                        val result = MojangAPIUtil.getUUID(listOf(username))
+                        if (result.wasSuccessful()) {
+                            if (result.value == null || result.value.isEmpty()) {
+                                object : BukkitRunnable() {
+                                    override fun run() {
+                                        val calls: List<SkinCallBack> = callbacks[u]!!
+                                        callbacks.remove(u)
+                                        for (s in calls) {
+                                            s.callBack(EMPTY_SKIN, true, null)
+                                        }
                                     }
-                                    return new Skin(data.getUUID(), data.getBase64(), data.getSignedBase64());
-                                }
-                            } else {
-                                throw result.getException();
+                                }.runTask(PlayerList.plugin)
+                                return
                             }
-                            return Skin.EMPTY_SKIN;
-                        }
-                    });
-            // skin_Enabled = true;
-        } catch (Exception | Error e5) {
-        }
-    }
-
-    static Map<UUID, String> callbacksUUID = new HashMap<UUID, String>();
-    static Map<String, List<SkinCallBack>> callbacks = new HashMap<String, List<SkinCallBack>>();
-
-    /**
-     * Gets the skin for a username.
-     * <p>
-     * Since fetching this skin requires making asynchronous requests to Mojang's
-     * servers, a call back mechanism using the SkinCallBack class is implemented.
-     * This call back allows you to also handle any errors that might have occurred
-     * while fetching the skin. If no users with the specified username can be
-     * found, the skin passed to the callback will be Skin.EMPTY_SKIN.
-     * <p>
-     * The call back will always be fired on the main thread.
-     *
-     * @param username
-     *            the username to get the skin of
-     * @param callBack
-     *            the call back to handle the result of the request
-     */
-    public static void getSkin(String username, SkinCallBack callBack) {
-        boolean newcall = false;
-        if (!callbacks.containsKey(username)) {
-            callbacks.put(username, new ArrayList<SkinCallBack>());
-            newcall = true;
-        }
-        callbacks.get(username).add(callBack);
-
-        if (newcall) {
-            new BukkitRunnable() {
-                String u = username;
-
-                @Override
-                public void run() {
-                    MojangAPIUtil.Result<Map<String, MojangAPIUtil.Profile>> result = MojangAPIUtil
-                            .getUUID(Collections.singletonList(username));
-                    if (result.wasSuccessful()) {
-                        if (result.getValue() == null || result.getValue().isEmpty()) {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    List<SkinCallBack> calls = callbacks.get(u);
-                                    callbacks.remove(u);
-                                    for (SkinCallBack s : calls) {
-                                        s.callBack(Skin.EMPTY_SKIN, true, null);
+                            for ((key, value) in result.value) {
+                                if (key.equals(username, ignoreCase = true)) {
+                                    callbacksUUID[value.uUID] = u
+                                    getSkin(value.uUID, callBack)
+                                    return
+                                }
+                            }
+                        } else {
+                            object : BukkitRunnable() {
+                                override fun run() {
+                                    val calls: List<SkinCallBack> = callbacks[u]!!
+                                    callbacks.remove(u)
+                                    for (s in calls) {
+                                        s.callBack(null, false, result.exception)
                                     }
                                 }
-                            }.runTask(PlayerList.plugin);
-                            return;
+                            }.runTask(PlayerList.plugin)
                         }
-                        for (Map.Entry<String, MojangAPIUtil.Profile> entry : result.getValue().entrySet()) {
-                            if (entry.getKey().equalsIgnoreCase(username)) {
-                                callbacksUUID.put(entry.getValue().getUUID(), u);
-                                getSkin(entry.getValue().getUUID(), callBack);
-                                return;
-                            }
-                        }
-                    } else {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                List<SkinCallBack> calls = callbacks.get(u);
-                                callbacks.remove(u);
-                                for (SkinCallBack s : calls) {
-                                    s.callBack(null, false, result.getException());
-                                }
-                            }
-                        }.runTask(PlayerList.plugin);
                     }
-                }
-            }.runTaskAsynchronously(PlayerList.plugin);
+                }.runTaskAsynchronously(PlayerList.plugin)
+            }
         }
-    }
 
-    /**
-     * Gets the skin for a UUID.
-     * <p>
-     * Since fetching this skin might require making asynchronous requests to
-     * Mojang's servers, a call back mechanism using the SkinCallBack class is
-     * implemented. This call back allows you to also handle any errors that might
-     * have occurred while fetching the skin.
-     * <p>
-     * The call back will always be fired on the main thread.
-     *
-     * @param uuid
-     *            the uuid to get the skin of
-     * @param callBack
-     *            the call back to handle the result of the request
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static void getSkin(UUID uuid, SkinCallBack callBack) {
-        /*
+        /**
+         * Gets the skin for a UUID.
+         *
+         *
+         * Since fetching this skin might require making asynchronous requests to
+         * Mojang's servers, a call back mechanism using the SkinCallBack class is
+         * implemented. This call back allows you to also handle any errors that might
+         * have occurred while fetching the skin.
+         *
+         *
+         * The call back will always be fired on the main thread.
+         *
+         * @param uuid
+         * the uuid to get the skin of
+         * @param callBack
+         * the call back to handle the result of the request
+         */
+        fun getSkin(uuid: UUID, callBack: SkinCallBack) {
+            /*
          * if(!skin_Enabled) { callBack.callBack(Skin.EMPTY_SKIN, false, null); return;
          * } // Map<UUID, Skin> asMap = SKIN_CACHE.asMap(); try {
          * SKIN_CACHE.getClass().getDeclaredMethod("asMap", new Class[0]); } catch
          * (Exception e1) { callBack.callBack(Skin.EMPTY_SKIN, false, null); return; }
          */
 
-        // @SuppressWarnings("unchecked")
-        // Map<UUID, Skin> asMap = (Map<UUID, Skin>)
-        // ReflectionUtil.invokeMethod(SKIN_CACHE, "asMap", new Class[0]);
-        Map<UUID, Skin> asMap = null;
-        try {
-            asMap = ((com.google.common.cache.Cache) SKIN_CACHE).asMap();
-        } catch (Exception | Error e4) {
-            callBack.callBack(Skin.EMPTY_SKIN, true, null);
-            return;
-        }
-        if (asMap.containsKey(uuid)) {
-            for (SkinCallBack s : callbacks.get(callbacksUUID.get(uuid))) {
-                s.callBack(asMap.get(uuid), true, null);
+            // @SuppressWarnings("unchecked")
+            // Map<UUID, Skin> asMap = (Map<UUID, Skin>)
+            // ReflectionUtil.invokeMethod(SKIN_CACHE, "asMap", new Class[0]);
+            var asMap: Map<UUID?, Skin?>? = null
+            try {
+                asMap = (SKIN_CACHE as LoadingCache<UUID?, Skin?>?)?.asMap()
+            } catch (e4: Exception) {
+                callBack.callBack(EMPTY_SKIN, true, null)
+                return
+            } catch (e4: Error) {
+                callBack.callBack(EMPTY_SKIN, true, null)
+                return
             }
-        } else {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    try {
-                        // Skin skin = SKIN_CACHE.get(uuid);
-                        // = (Skin) ReflectionUtil.invokeMethod(SKIN_CACHE, "get", new Class[] {
-                        // UUID.class },uuid);
-                        Skin skin = ((com.google.common.cache.LoadingCache<UUID, Skin>) SKIN_CACHE).get(uuid);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for (SkinCallBack s : callbacks.get(callbacksUUID.get(uuid))) {
-                                    s.callBack(skin, true, null);
-                                }
-                            }
-                        }.runTask(PlayerList.plugin);
-                    } catch (Exception e) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                for (SkinCallBack s : callbacks.get(callbacksUUID.get(uuid))) {
-                                    s.callBack(null, false, e);
-                                }
-                            }
-                        }.runTask(PlayerList.plugin);
-                    }
+            if (asMap?.containsKey(uuid) == true) {
+                for (s in callbacks[callbacksUUID[uuid]]!!) {
+                    s.callBack(asMap[uuid], true, null)
                 }
-            }.runTaskAsynchronously(PlayerList.plugin);
+            } else {
+                object : BukkitRunnable() {
+                    override fun run() {
+                        try {
+                            // Skin skin = SKIN_CACHE.get(uuid);
+                            // = (Skin) ReflectionUtil.invokeMethod(SKIN_CACHE, "get", new Class[] {
+                            // UUID.class },uuid);
+                            val skin = (SKIN_CACHE as LoadingCache<UUID?, Skin?>?)!![uuid]
+                            object : BukkitRunnable() {
+                                override fun run() {
+                                    for (s in callbacks[callbacksUUID[uuid]]!!) {
+                                        s.callBack(skin, true, null)
+                                    }
+                                }
+                            }.runTask(PlayerList.plugin)
+                        } catch (e: Exception) {
+                            object : BukkitRunnable() {
+                                override fun run() {
+                                    for (s in callbacks[callbacksUUID[uuid]]!!) {
+                                        s.callBack(null, false, e)
+                                    }
+                                }
+                            }.runTask(PlayerList.plugin)
+                        }
+                    }
+                }.runTaskAsynchronously(PlayerList.plugin)
+            }
+        }
+
+        val EMPTY_SKIN = Skin()
+        fun deserialize(map: Map<String?, Any?>): Skin {
+            return if (map.containsKey("empty")) {
+                EMPTY_SKIN
+            } else {
+                Skin(
+                    UUID.fromString(map["uuid"] as String?), map["base64"] as String?,
+                    if (map.containsKey("signedBase64")) map["signedBase64"] as String? else null
+                )
+            }
+        }
+
+        // private static boolean skin_Enabled = false;
+        init {
+            try {
+                SKIN_CACHE = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES)
+                    .build(object : CacheLoader<UUID, Skin>() {
+                        @Throws(Exception::class)
+                        override fun load(uuid: UUID): Skin {
+                            val result = MojangAPIUtil.getSkinData(uuid)
+                            if (result.wasSuccessful()) {
+                                if (result.value != null) {
+                                    val data = result.value
+                                    return if (data.skinURL == null && data.capeURL == null) {
+                                        EMPTY_SKIN
+                                    } else Skin(data.uUID, data.base64, data.signedBase64)
+                                }
+                            } else {
+                                throw result.exception!!
+                            }
+                            return EMPTY_SKIN
+                        }
+                    })
+                // skin_Enabled = true;
+            } catch (e5: Exception) {
+            } catch (e5: Error) {
+            }
         }
     }
 
-    public static final Skin EMPTY_SKIN = new Skin();
-
-    private UUID uuid;
-    private String base64;
-    private String signedBase64;
+    var uUID: UUID? = null
+        private set
+    var base64: String? = null
+        private set
+    var signedBase64: String? = null
+        private set
 
     /**
      * Initializes this class with the specified skin.
      *
      * @param uuid
-     *            The uuid of the user who this skin belongs to
+     * The uuid of the user who this skin belongs to
      * @param base64
-     *            the base64 data of the skin, as returned by Mojang's servers.
+     * the base64 data of the skin, as returned by Mojang's servers.
      * @param signedBase64
-     *            the signed data of the skin, as returned by Mojang's servers.
+     * the signed data of the skin, as returned by Mojang's servers.
      */
-    public Skin(UUID uuid, String base64, String signedBase64) {
-        Validate.notNull(uuid, "uuid cannot be null");
-        Validate.notNull(base64, "base64 cannot be null");
-        this.uuid = uuid;
-        this.base64 = base64;
-        this.signedBase64 = signedBase64;
+    constructor(uuid: UUID?, base64: String?, signedBase64: String?) {
+        Validate.notNull(uuid, "uuid cannot be null")
+        Validate.notNull(base64, "base64 cannot be null")
+        uUID = uuid
+        this.base64 = base64
+        this.signedBase64 = signedBase64
     }
 
-    private Skin() {
+    private constructor() {}
+
+    fun hasSignedBase64(): Boolean {
+        return signedBase64 != null
     }
 
-    public boolean hasSignedBase64() {
-        return signedBase64 != null;
-    }
-
-    public String getSignedBase64() {
-        return signedBase64;
-    }
-
-    public String getBase64() {
-        return base64;
-    }
-
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
+    override fun equals(obj: Any?): Boolean {
+        if (obj === this) {
+            return true
         }
-        if (!(obj instanceof Skin)) {
-            return false;
+        if (obj !is Skin) {
+            return false
         }
-        Skin skin = (Skin) obj;
-        if (skin == Skin.EMPTY_SKIN) {
-            return this == Skin.EMPTY_SKIN;
-        }
-        return skin.base64.equals(this.base64) && skin.uuid.equals(this.uuid)
-                && skin.signedBase64.equals(this.signedBase64);
+        val skin = obj
+        return if (skin === EMPTY_SKIN) {
+            this === EMPTY_SKIN
+        } else skin.base64 == base64 && skin.uUID == uUID && skin.signedBase64 == signedBase64
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.base64, this.uuid, this.signedBase64);
+    override fun hashCode(): Int {
+        return Objects.hash(base64, uUID, signedBase64)
     }
 
-    @Override
-    public String toString() {
-        return "Skin{uuid=" + uuid + ",base64=" + base64 + ",signedBase64=" + signedBase64 + "}";
+    override fun toString(): String {
+        return "Skin{uuid=" + uUID + ",base64=" + base64 + ",signedBase64=" + signedBase64 + "}"
     }
 
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = Maps.newHashMap();
-        if (this == EMPTY_SKIN) {
-            map.put("empty", "true");
+    override fun serialize(): Map<String, Any> {
+        val map: MutableMap<String, Any> = Maps.newHashMap()
+        if (this === EMPTY_SKIN) {
+            map["empty"] = "true"
         } else {
-            map.put("uuid", uuid);
-            map.put("base64", base64);
+            map["uuid"] = uUID!!
+            map["base64"] = base64!!
             if (hasSignedBase64()) {
-                map.put("signedBase64", signedBase64);
+                map["signedBase64"] = signedBase64!!
             }
         }
-        return map;
-    }
-
-    public static Skin deserialize(Map<String, Object> map) {
-        if (map.containsKey("empty")) {
-            return EMPTY_SKIN;
-        } else {
-            return new Skin(UUID.fromString((String) map.get("uuid")), (String) map.get("base64"),
-                    (map.containsKey("signedBase64") ? (String) map.get("signedBase64") : null));
-        }
+        return map
     }
 }
 
 /**
  * Implementation to make requests to Mojang's API servers. See
  * http://wiki.vg/Mojang_API for more information.
- * <p>
+ *
+ *
  * Since all of these methods require connections to Mojang's servers, all of
  * them execute asynchronously, and do therefor not return any values. Instead,
  * a callback mechanism is implemented, which allows for processing of data
@@ -1259,122 +1258,91 @@ class Skin implements ConfigurationSerializable {
  * the 'successful' boolean in the callback will be set to false. In these
  * cases, null will be passed to the callback, even if some data has been
  * received.
- * <p>
+ *
+ *
  * Each method has an synchronous and an asynchronous version. It is recommended
  * that you use the synchronous version unless you're intending to do more tasks
  * that should be executed asynchronously.
  *
  * @author AlvinB
  */
-class MojangAPIUtil {
-    private static URL API_STATUS_URL = null;
-    private static URL GET_UUID_URL = null;
-    private static final JSONParser PARSER = new JSONParser();
-
-    private static Plugin plugin;
-
-    static {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (plugin.getClass().getProtectionDomain().getCodeSource()
-                    .equals(MojangAPIUtil.class.getProtectionDomain().getCodeSource())) {
-                MojangAPIUtil.plugin = plugin;
-            }
-        }
-        try {
-            API_STATUS_URL = new URL("https://status.mojang.com/check");
-            GET_UUID_URL = new URL("https://api.mojang.com/profiles/minecraft");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
+internal object MojangAPIUtil {
+    private var API_STATUS_URL: URL? = null
+    private var GET_UUID_URL: URL? = null
+    private val PARSER = JSONParser()
+    private var plugin: Plugin? = null
 
     /**
      * Sets the plugin instance to use for scheduler tasks.
-     * <p>
+     *
+     *
      * The plugin instance in the same jar as this class should automatically be
      * found, so only use this if you for whatever reason need to use another plugin
      * instance.
      *
      * @param plugin
-     *            the plugin instance
+     * the plugin instance
      */
-    public static void setPlugin(Plugin plugin) {
-        MojangAPIUtil.plugin = plugin;
+    fun setPlugin(plugin: Plugin?) {
+        MojangAPIUtil.plugin = plugin
     }
 
     /**
      * Same as #getAPIStatusAsync, but the callback is executed synchronously
      */
-    public static void getAPIStatusWithCallBack(ResultCallBack<Map<String, APIStatus>> callBack) {
-        getAPIStatusAsyncWithCallBack((successful, result, exception) -> new BukkitRunnable() {
-            @Override
-            public void run() {
-                callBack.callBack(successful, result, exception);
-            }
-        }.runTask(plugin));
+    fun getAPIStatusWithCallBack(callBack: ResultCallBack<Map<String?, APIStatus?>?>) {
+        getAPIStatusAsyncWithCallBack { successful: Boolean, result: Map<String?, APIStatus?>?, exception: Exception? ->
+            object : BukkitRunnable() {
+                override fun run() {
+                    callBack.callBack(successful, result, exception)
+                }
+            }.runTask(plugin)
+        }
     }
 
     /**
      * Gets the current state of Mojang's API
-     * <p>
+     *
+     *
      * The keys of the map passed to the callback is the service, and the value is
      * the current state of the service. Statuses can be either RED (meaning service
      * unavailable), YELLOW (meaning service available, but with some issues) and
      * GREEN (meaning service fully functional).
      *
      * @param callBack
-     *            the callback of the request
+     * the callback of the request
      * @see APIStatus
      */
-    @SuppressWarnings("unchecked")
-    public static void getAPIStatusAsyncWithCallBack(ResultCallBack<Map<String, APIStatus>> callBack) {
+    fun getAPIStatusAsyncWithCallBack(callBack: ResultCallBack<Map<String?, APIStatus?>?>?) {
         if (plugin == null) {
-            return;
+            return
         }
-        makeAsyncGetRequest(API_STATUS_URL, (successful, response, exception, responseCode) -> {
+        makeAsyncGetRequest(API_STATUS_URL) { successful: Boolean, response: String?, exception: Exception?, responseCode: Int ->
             if (callBack == null) {
-                return;
+                return@makeAsyncGetRequest
             }
             if (successful && responseCode == 200) {
                 try {
-                    Map<String, APIStatus> map = Maps.newHashMap();
-                    JSONArray jsonArray = (JSONArray) PARSER.parse(response);
-                    for (JSONObject jsonObject : (List<JSONObject>) jsonArray) {
-                        for (JSONObject.Entry<String, String> entry : ((Map<String, String>) jsonObject).entrySet()) {
-                            map.put(entry.getKey(), APIStatus.fromString(entry.getValue()));
+                    val map: MutableMap<String?, APIStatus?> = Maps.newHashMap()
+                    val jsonArray = PARSER.parse(response) as JSONArray
+                    for (jsonObject in jsonArray as List<JSONObject>) {
+                        for ((key, value) in jsonObject as Map<String?, String>) {
+                            map[key] = APIStatus.fromString(value)
                         }
                     }
-                    callBack.callBack(true, map, null);
-                } catch (Exception e) {
-                    callBack.callBack(false, null, e);
+                    callBack.callBack(true, map, null)
+                } catch (e: Exception) {
+                    callBack.callBack(false, null, e)
                 }
             } else {
                 if (exception != null) {
-                    callBack.callBack(false, null, exception);
+                    callBack.callBack(false, null, exception)
                 } else {
-                    callBack.callBack(false, null,
-                            new IOException("Failed to obtain Mojang data! Response code: " + responseCode));
+                    callBack.callBack(
+                        false, null,
+                        IOException("Failed to obtain Mojang data! Response code: $responseCode")
+                    )
                 }
-            }
-        });
-    }
-
-    /**
-     * The statuses of Mojang's API used by getAPIStatus().
-     */
-    public enum APIStatus {
-        RED, YELLOW, GREEN;
-
-        public static APIStatus fromString(String string) {
-            switch (string) {
-                case "red":
-                    return RED;
-                case "yellow":
-                    return YELLOW;
-                case "green":
-                    return GREEN;
-                default:
-                    throw new IllegalArgumentException("Unknown status: " + string);
             }
         }
     }
@@ -1382,21 +1350,27 @@ class MojangAPIUtil {
     /**
      * Same as #getUUIDAtTimeAsync, but the callback is executed synchronously
      */
-    public static void getUUIDAtTimeWithCallBack(String username, long timeStamp, ResultCallBack<UUIDAtTime> callBack) {
-        getUUIDAtTimeAsyncWithCallBack(username, timeStamp, (successful, result, exception) -> new BukkitRunnable() {
-            @Override
-            public void run() {
-                callBack.callBack(successful, result, exception);
-            }
-        }.runTask(plugin));
+    fun getUUIDAtTimeWithCallBack(username: String, timeStamp: Long, callBack: ResultCallBack<UUIDAtTime?>) {
+        getUUIDAtTimeAsyncWithCallBack(
+            username,
+            timeStamp
+        ) { successful: Boolean, result: UUIDAtTime?, exception: Exception? ->
+            object : BukkitRunnable() {
+                override fun run() {
+                    callBack.callBack(successful, result, exception)
+                }
+            }.runTask(plugin)
+        }
     }
 
     /**
      * Gets the UUID of a name at a certain point in time
-     * <p>
+     *
+     *
      * The timestamp is in UNIX Time, and if -1 is used as the timestamp, it will
      * get the current user who has this name.
-     * <p>
+     *
+     *
      * The callback contains the UUID and the current username of the UUID. If the
      * username was not occupied at the specified time, the next person to occupy
      * the name will be returned, provided that the name has been changed away from
@@ -1404,180 +1378,151 @@ class MojangAPIUtil {
      * not legacy, the value passed to the callback will be null.
      *
      * @param username
-     *            the username of the player to do the UUID lookup on
+     * the username of the player to do the UUID lookup on
      * @param timeStamp
-     *            the timestamp when the name was occupied
+     * the timestamp when the name was occupied
      * @param callBack
-     *            the callback of the request
+     * the callback of the request
      */
-    public static void getUUIDAtTimeAsyncWithCallBack(String username, long timeStamp,
-                                                      ResultCallBack<UUIDAtTime> callBack) {
+    fun getUUIDAtTimeAsyncWithCallBack(
+        username: String, timeStamp: Long,
+        callBack: ResultCallBack<UUIDAtTime?>?
+    ) {
         if (plugin == null) {
-            return;
+            return
         }
-        Validate.notNull(username);
-        Validate.isTrue(!username.isEmpty(), "username cannot be empty");
+        Validate.notNull(username)
+        Validate.isTrue(!username.isEmpty(), "username cannot be empty")
         try {
-            URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username
-                    + (timeStamp != -1 ? "?at=" + timeStamp : ""));
-            makeAsyncGetRequest(url, (successful, response, exception, responseCode) -> {
+            val url = URL(
+                "https://api.mojang.com/users/profiles/minecraft/" + username
+                        + if (timeStamp != -1L) "?at=$timeStamp" else ""
+            )
+            makeAsyncGetRequest(url) { successful: Boolean, response: String?, exception: Exception?, responseCode: Int ->
                 if (callBack == null) {
-                    return;
+                    return@makeAsyncGetRequest
                 }
                 if (successful && (responseCode == 200 || responseCode == 204)) {
                     try {
-                        UUIDAtTime[] uuidAtTime = new UUIDAtTime[1];
+                        val uuidAtTime = arrayOfNulls<UUIDAtTime>(1)
                         if (responseCode == 200) {
-                            JSONObject object = (JSONObject) PARSER.parse(response);
-                            String uuidString = (String) object.get("id");
-                            uuidAtTime[0] = new UUIDAtTime((String) object.get("name"), getUUIDFromString(uuidString));
+                            val `object` = PARSER.parse(response) as JSONObject
+                            val uuidString = `object`["id"] as String
+                            uuidAtTime[0] = UUIDAtTime(`object`["name"] as String, getUUIDFromString(uuidString))
                         }
-                        callBack.callBack(true, uuidAtTime[0], null);
-                    } catch (Exception e) {
-                        callBack.callBack(false, null, e);
+                        callBack.callBack(true, uuidAtTime[0], null)
+                    } catch (e: Exception) {
+                        callBack.callBack(false, null, e)
                     }
                 } else {
                     if (exception != null) {
-                        callBack.callBack(false, null, exception);
+                        callBack.callBack(false, null, exception)
                     } else {
-                        callBack.callBack(false, null,
-                                new IOException("Failed to obtain Mojang data! Response code: " + responseCode));
+                        callBack.callBack(
+                            false, null,
+                            IOException("Failed to obtain Mojang data! Response code: $responseCode")
+                        )
                     }
                 }
-            });
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static class UUIDAtTime {
-        private String name;
-        private UUID uuid;
-
-        public UUIDAtTime(String name, UUID uuid) {
-            this.name = name;
-            this.uuid = uuid;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public UUID getUUID() {
-            return uuid;
-        }
-
-        @Override
-        public String toString() {
-            return "UUIDAtTime{name=" + name + ",uuid=" + uuid + "}";
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
             }
-            if (!(obj instanceof UUIDAtTime)) {
-                return false;
-            }
-            UUIDAtTime uuidAtTime = (UUIDAtTime) obj;
-            return this.name.equals(uuidAtTime.name) && this.uuid.equals(uuidAtTime.uuid);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.name, this.uuid);
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
         }
     }
 
     /**
      * Same as #getNameHistoryAsync, but the callback is executed synchronously
      */
-    public static void getNameHistoryWithCallBack(UUID uuid, ResultCallBack<Map<String, Long>> callBack) {
-        getNameHistoryAsyncWithCallBack(uuid, (successful, result, exception) -> new BukkitRunnable() {
-            @Override
-            public void run() {
-                callBack.callBack(successful, result, exception);
-            }
-        }.runTask(plugin));
+    fun getNameHistoryWithCallBack(uuid: UUID, callBack: ResultCallBack<Map<String?, Long?>?>) {
+        getNameHistoryAsyncWithCallBack(uuid) { successful: Boolean, result: Map<String?, Long?>?, exception: Exception? ->
+            object : BukkitRunnable() {
+                override fun run() {
+                    callBack.callBack(successful, result, exception)
+                }
+            }.runTask(plugin)
+        }
     }
 
     /**
      * Gets the name history of a certain UUID
-     * <p>
-     * The callback is passed a Map<String, Long>, the String being the name, and
+     *
+     *
+     * The callback is passed a Map<String></String>, Long>, the String being the name, and
      * the long being the UNIX millisecond timestamp the user changed to that name.
      * If the name was the original name of the user, the long will be -1L.
-     * <p>
+     *
+     *
      * If an unused UUID is supplied, an empty Map will be passed to the callback.
      *
      * @param uuid
-     *            the uuid of the account
+     * the uuid of the account
      * @param callBack
-     *            the callback of the request
+     * the callback of the request
      */
-    @SuppressWarnings("unchecked")
-    public static void getNameHistoryAsyncWithCallBack(UUID uuid, ResultCallBack<Map<String, Long>> callBack) {
+    fun getNameHistoryAsyncWithCallBack(uuid: UUID, callBack: ResultCallBack<Map<String?, Long?>?>?) {
         if (plugin == null) {
-            return;
+            return
         }
-        Validate.notNull(uuid, "uuid cannot be null!");
+        Validate.notNull(uuid, "uuid cannot be null!")
         try {
-            URL url = new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names");
-            makeAsyncGetRequest(url, (successful, response, exception, responseCode) -> {
+            val url = URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")
+            makeAsyncGetRequest(url) { successful: Boolean, response: String?, exception: Exception?, responseCode: Int ->
                 if (callBack == null) {
-                    return;
+                    return@makeAsyncGetRequest
                 }
                 if (successful && (responseCode == 200 || responseCode == 204)) {
                     try {
-                        Map<String, Long> map = Maps.newHashMap();
+                        val map: MutableMap<String?, Long?> = Maps.newHashMap()
                         if (responseCode == 200) {
-                            JSONArray jsonArray = (JSONArray) PARSER.parse(response);
-                            for (JSONObject jsonObject : (List<JSONObject>) jsonArray) {
-                                String name = (String) jsonObject.get("name");
+                            val jsonArray = PARSER.parse(response) as JSONArray
+                            for (jsonObject in jsonArray as List<JSONObject>) {
+                                val name = jsonObject["name"] as String
                                 if (jsonObject.containsKey("changedToAt")) {
-                                    map.put(name, (Long) jsonObject.get("changedToAt"));
+                                    map[name] = jsonObject["changedToAt"] as Long?
                                 } else {
-                                    map.put(name, -1L);
+                                    map[name] = -1L
                                 }
                             }
                         }
-                        callBack.callBack(true, map, null);
-                    } catch (Exception e) {
-                        callBack.callBack(false, null, e);
+                        callBack.callBack(true, map, null)
+                    } catch (e: Exception) {
+                        callBack.callBack(false, null, e)
                     }
                 } else {
                     if (exception != null) {
-                        callBack.callBack(false, null, exception);
+                        callBack.callBack(false, null, exception)
                     } else {
-                        callBack.callBack(false, null,
-                                new IOException("Failed to obtain Mojang data! Response code: " + responseCode));
+                        callBack.callBack(
+                            false, null,
+                            IOException("Failed to obtain Mojang data! Response code: $responseCode")
+                        )
                     }
                 }
-            });
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            }
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
         }
     }
 
-    public static void getUUIDWithCallBack(ResultCallBack<Map<String, Profile>> callBack, String... usernames) {
-        getUUIDWithCallBack(Arrays.asList(usernames), callBack);
+    fun getUUIDWithCallBack(callBack: ResultCallBack<Map<String?, Profile?>?>, vararg usernames: String?) {
+        getUUIDWithCallBack(Arrays.asList(*usernames), callBack)
     }
 
     /**
      * Same as #getUUIDAsync, but the callback is executed synchronously
      */
-    public static void getUUIDWithCallBack(List<String> usernames, ResultCallBack<Map<String, Profile>> callBack) {
-        getUUIDAsyncWithCallBack(usernames, (successful, result, exception) -> new BukkitRunnable() {
-            @Override
-            public void run() {
-                callBack.callBack(successful, result, exception);
-            }
-        }.runTask(plugin));
+    fun getUUIDWithCallBack(usernames: List<String?>, callBack: ResultCallBack<Map<String?, Profile?>?>) {
+        getUUIDAsyncWithCallBack(usernames) { successful: Boolean, result: Map<String?, Profile?>?, exception: Exception? ->
+            object : BukkitRunnable() {
+                override fun run() {
+                    callBack.callBack(successful, result, exception)
+                }
+            }.runTask(plugin)
+        }
     }
 
-    public static void getUUIDAsyncWithCallBack(ResultCallBack<Map<String, Profile>> callBack, String... usernames) {
-        getUUIDAsyncWithCallBack(Arrays.asList(usernames), callBack);
+    fun getUUIDAsyncWithCallBack(callBack: ResultCallBack<Map<String?, Profile?>?>?, vararg usernames: String?) {
+        getUUIDAsyncWithCallBack(Arrays.asList(*usernames), callBack)
     }
 
     /**
@@ -1585,48 +1530,48 @@ class MojangAPIUtil {
      * Should be used with caution to avoid blocking any important activities on the
      * current thread.
      */
-    @SuppressWarnings("unchecked")
-    public static Result<Map<String, Profile>> getUUID(List<String> usernames) {
+    fun getUUID(usernames: List<String?>): Result<Map<String, Profile>?> {
         if (plugin == null) {
-            return new Result<>(null, false, new RuntimeException("No plugin instance found!"));
+            return Result(null, false, RuntimeException("No plugin instance found!"))
         }
-        Validate.notNull(usernames, "usernames cannot be null");
-        Validate.isTrue(usernames.size() <= 100, "cannot request more than 100 usernames at once");
-        JSONArray usernameJson = new JSONArray();
-        usernameJson.addAll(usernames.stream().filter(s -> !Strings.isNullOrEmpty(s)).collect(Collectors.toList()));
-        RequestResult result = makeSyncPostRequest(GET_UUID_URL, usernameJson.toJSONString());
-        if (result == null) {
-            return new Result<>(null, false, new RuntimeException("No plugin instance found!"));
-        }
-        try {
+        Validate.notNull(usernames, "usernames cannot be null")
+        Validate.isTrue(usernames.size <= 100, "cannot request more than 100 usernames at once")
+        val usernameJson = JSONArray()
+        usernameJson.addAll(usernames.stream().filter { s: String? -> !Strings.isNullOrEmpty(s) }
+            .collect(Collectors.toList()))
+        val result = makeSyncPostRequest(GET_UUID_URL, usernameJson.toJSONString())
+            ?: return Result(null, false, RuntimeException("No plugin instance found!"))
+        return try {
             if (result.successful && result.responseCode == 200) {
-                Map<String, Profile> map = Maps.newHashMap();
-                JSONArray jsonArray = (JSONArray) PARSER.parse(result.response);
+                val map: MutableMap<String, Profile> = Maps.newHashMap()
+                val jsonArray = PARSER.parse(result.response) as JSONArray
                 // noinspection Duplicates
-                for (JSONObject jsonObject : (List<JSONObject>) jsonArray) {
-                    String uuidString = (String) jsonObject.get("id");
-                    String name = (String) jsonObject.get("name");
-                    boolean legacy = false;
+                for (jsonObject in jsonArray as List<JSONObject>) {
+                    val uuidString = jsonObject["id"] as String
+                    val name = jsonObject["name"] as String
+                    var legacy = false
                     if (jsonObject.containsKey("legacy")) {
-                        legacy = (boolean) jsonObject.get("legacy");
+                        legacy = jsonObject["legacy"] as Boolean
                     }
-                    boolean unpaid = false;
+                    var unpaid = false
                     if (jsonObject.containsKey("demo")) {
-                        unpaid = (boolean) jsonObject.get("demo");
+                        unpaid = jsonObject["demo"] as Boolean
                     }
-                    map.put(name, new Profile(getUUIDFromString(uuidString), name, legacy, unpaid));
+                    map[name] = Profile(getUUIDFromString(uuidString), name, legacy, unpaid)
                 }
-                return new Result<>(map, true, null);
+                Result(map, true, null)
             } else {
                 if (result.exception != null) {
-                    return new Result<>(null, false, result.exception);
+                    Result(null, false, result.exception)
                 } else {
-                    return new Result<>(null, false,
-                            new IOException("Failed to obtain Mojang data! Response code: " + result.responseCode));
+                    Result(
+                        null, false,
+                        IOException("Failed to obtain Mojang data! Response code: " + result.responseCode)
+                    )
                 }
             }
-        } catch (Exception e) {
-            return new Result<>(null, false, e);
+        } catch (e: Exception) {
+            Result(null, false, e)
         }
     }
 
@@ -1634,107 +1579,58 @@ class MojangAPIUtil {
      * Gets the Profiles of up to 100 usernames.
      *
      * @param usernames
-     *            the usernames
+     * the usernames
      * @param callBack
-     *            the callback
+     * the callback
      */
-    @SuppressWarnings("unchecked")
-    public static void getUUIDAsyncWithCallBack(List<String> usernames, ResultCallBack<Map<String, Profile>> callBack) {
+    fun getUUIDAsyncWithCallBack(usernames: List<String?>, callBack: ResultCallBack<Map<String?, Profile?>?>?) {
         if (plugin == null) {
-            return;
+            return
         }
-        Validate.notNull(usernames, "usernames cannot be null");
-        Validate.isTrue(usernames.size() <= 100, "cannot request more than 100 usernames at once");
-        JSONArray usernameJson = new JSONArray();
-        usernameJson.addAll(usernames.stream().filter(s -> !Strings.isNullOrEmpty(s)).collect(Collectors.toList()));
-        makeAsyncPostRequest(GET_UUID_URL, usernameJson.toJSONString(),
-                (successful, response, exception, responseCode) -> {
-                    if (callBack == null) {
-                        return;
-                    }
-                    try {
-                        if (successful && responseCode == 200) {
-                            Map<String, Profile> map = Maps.newHashMap();
-                            JSONArray jsonArray = (JSONArray) PARSER.parse(response);
-                            // noinspection Duplicates
-                            for (JSONObject jsonObject : (List<JSONObject>) jsonArray) {
-                                String uuidString = (String) jsonObject.get("id");
-                                String name = (String) jsonObject.get("name");
-                                boolean legacy = false;
-                                if (jsonObject.containsKey("legacy")) {
-                                    legacy = (boolean) jsonObject.get("legacy");
-                                }
-                                boolean unpaid = false;
-                                if (jsonObject.containsKey("demo")) {
-                                    unpaid = (boolean) jsonObject.get("demo");
-                                }
-                                map.put(name, new Profile(getUUIDFromString(uuidString), name, legacy, unpaid));
-                            }
-                            callBack.callBack(true, map, null);
-                        } else {
-                            if (exception != null) {
-                                callBack.callBack(false, null, exception);
-                            } else {
-                                callBack.callBack(false, null, new IOException(
-                                        "Failed to obtain Mojang data! Response code: " + responseCode));
-                            }
+        Validate.notNull(usernames, "usernames cannot be null")
+        Validate.isTrue(usernames.size <= 100, "cannot request more than 100 usernames at once")
+        val usernameJson = JSONArray()
+        usernameJson.addAll(usernames.stream().filter { s: String? -> !Strings.isNullOrEmpty(s) }
+            .collect(Collectors.toList()))
+        makeAsyncPostRequest(
+            GET_UUID_URL, usernameJson.toJSONString()
+        ) { successful: Boolean, response: String?, exception: Exception?, responseCode: Int ->
+            if (callBack == null) {
+                return@makeAsyncPostRequest
+            }
+            try {
+                if (successful && responseCode == 200) {
+                    val map: MutableMap<String?, Profile?> = Maps.newHashMap()
+                    val jsonArray = PARSER.parse(response) as JSONArray
+                    // noinspection Duplicates
+                    for (jsonObject in jsonArray as List<JSONObject>) {
+                        val uuidString = jsonObject["id"] as String
+                        val name = jsonObject["name"] as String
+                        var legacy = false
+                        if (jsonObject.containsKey("legacy")) {
+                            legacy = jsonObject["legacy"] as Boolean
                         }
-                    } catch (Exception e) {
-                        callBack.callBack(false, null, e);
+                        var unpaid = false
+                        if (jsonObject.containsKey("demo")) {
+                            unpaid = jsonObject["demo"] as Boolean
+                        }
+                        map[name] = Profile(getUUIDFromString(uuidString), name, legacy, unpaid)
                     }
-                });
-    }
-
-    public static class Profile {
-        private UUID uuid;
-        private String name;
-        private boolean legacy;
-        private boolean unpaid;
-
-        Profile(UUID uuid, String name, boolean legacy, boolean unpaid) {
-            this.uuid = uuid;
-            this.name = name;
-            this.legacy = legacy;
-            this.unpaid = unpaid;
-        }
-
-        public UUID getUUID() {
-            return uuid;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean isLegacy() {
-            return legacy;
-        }
-
-        public boolean isUnpaid() {
-            return unpaid;
-        }
-
-        @Override
-        public String toString() {
-            return "Profile{uuid=" + uuid + ", name=" + name + ", legacy=" + legacy + ", unpaid=" + unpaid + "}";
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
+                    callBack.callBack(true, map, null)
+                } else {
+                    if (exception != null) {
+                        callBack.callBack(false, null, exception)
+                    } else {
+                        callBack.callBack(
+                            false, null, IOException(
+                                "Failed to obtain Mojang data! Response code: $responseCode"
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                callBack.callBack(false, null, e)
             }
-            if (!(obj instanceof Profile)) {
-                return false;
-            }
-            Profile otherProfile = (Profile) obj;
-            return uuid.equals(otherProfile.uuid) && name.equals(otherProfile.name) && legacy == otherProfile.legacy
-                    && unpaid == otherProfile.unpaid;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(uuid, name, legacy, unpaid);
         }
     }
 
@@ -1743,84 +1639,87 @@ class MojangAPIUtil {
      * thread. Should be used with caution to avoid blocking any important
      * activities on the current thread.
      */
-    @SuppressWarnings("unchecked")
-    public static Result<SkinData> getSkinData(UUID uuid) {
+    fun getSkinData(uuid: UUID): Result<SkinData?> {
         if (plugin == null) {
-            return new Result<>(null, false, new RuntimeException("No plugin instance found!"));
+            return Result(null, false, RuntimeException("No plugin instance found!"))
         }
-        URL url;
-        try {
-            url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/"
-                    + uuid.toString().replace("-", "") + "?unsigned=false");
-        } catch (MalformedURLException e) {
-            return new Result<>(null, false, e);
+        val url: URL
+        url = try {
+            URL(
+                "https://sessionserver.mojang.com/session/minecraft/profile/"
+                        + uuid.toString().replace("-", "") + "?unsigned=false"
+            )
+        } catch (e: MalformedURLException) {
+            return Result(null, false, e)
         }
-        RequestResult result = makeSyncGetRequest(url);
-        if (result == null) {
-            return new Result<>(null, false, new RuntimeException("No plugin instance found!"));
-        }
-        try {
+        val result = makeSyncGetRequest(url)
+            ?: return Result(null, false, RuntimeException("No plugin instance found!"))
+        return try {
             if (result.successful && (result.responseCode == 200 || result.responseCode == 204)) {
                 if (result.responseCode == 204) {
-                    return new Result<>(null, true, null);
+                    return Result(null, true, null)
                 }
-                JSONObject object = (JSONObject) PARSER.parse(result.response);
-                JSONArray propertiesArray = (JSONArray) object.get("properties");
-                String base64 = null;
-                String signedBase64 = null;
+                val `object` = PARSER.parse(result.response) as JSONObject
+                val propertiesArray = `object`["properties"] as JSONArray
+                var base64: String? = null
+                var signedBase64: String? = null
                 // noinspection Duplicates
-                for (JSONObject property : (List<JSONObject>) propertiesArray) {
-                    String name = (String) property.get("name");
-                    if (name.equals("textures")) {
-                        base64 = (String) property.get("value");
-                        signedBase64 = (String) property.get("signature");
+                for (property in propertiesArray as List<JSONObject>) {
+                    val name = property["name"] as String
+                    if (name == "textures") {
+                        base64 = property["value"] as String?
+                        signedBase64 = property["signature"] as String?
                     }
                 }
                 if (base64 == null) {
-                    return new Result<>(null, true, null);
+                    return Result(null, true, null)
                 }
-                String decodedBase64 = new String(Base64.getDecoder().decode(base64), "UTF-8");
-                JSONObject base64json = (JSONObject) PARSER.parse(decodedBase64);
-                long timeStamp = (long) base64json.get("timestamp");
-                String profileName = (String) base64json.get("profileName");
-                UUID profileId = getUUIDFromString((String) base64json.get("profileId"));
-                JSONObject textures = (JSONObject) base64json.get("textures");
-                String skinURL = null;
-                String capeURL = null;
+                val decodedBase64 = String(Base64.getDecoder().decode(base64), Charsets.UTF_8)
+                val base64json = PARSER.parse(decodedBase64) as JSONObject
+                val timeStamp = base64json["timestamp"] as Long
+                val profileName = base64json["profileName"] as String
+                val profileId = getUUIDFromString(base64json["profileId"] as String)
+                val textures = base64json["textures"] as JSONObject
+                var skinURL: String? = null
+                var capeURL: String? = null
                 if (textures.containsKey("SKIN")) {
-                    JSONObject skinObject = (JSONObject) textures.get("SKIN");
-                    skinURL = (String) skinObject.get("url");
+                    val skinObject = textures["SKIN"] as JSONObject
+                    skinURL = skinObject["url"] as String?
                 }
                 if (textures.containsKey("CAPE")) {
-                    JSONObject capeObject = (JSONObject) textures.get("CAPE");
-                    capeURL = (String) capeObject.get("url");
+                    val capeObject = textures["CAPE"] as JSONObject
+                    capeURL = capeObject["url"] as String?
                 }
-                return new Result<>(
-                        new SkinData(profileId, profileName, skinURL, capeURL, timeStamp, base64, signedBase64), true,
-                        null);
+                Result(
+                    SkinData(profileId, profileName, skinURL, capeURL, timeStamp, base64, signedBase64), true,
+                    null
+                )
             } else {
                 if (result.exception != null) {
-                    return new Result<>(null, false, result.exception);
+                    Result(null, false, result.exception)
                 } else {
-                    return new Result<>(null, false,
-                            new IOException("Failed to obtain Mojang data! Response code: " + result.responseCode));
+                    Result(
+                        null, false,
+                        IOException("Failed to obtain Mojang data! Response code: " + result.responseCode)
+                    )
                 }
             }
-        } catch (Exception e) {
-            return new Result<>(null, false, e);
+        } catch (e: Exception) {
+            Result(null, false, e)
         }
     }
 
     /**
      * Same as #getSkinDataAsync, but the callback is executed synchronously
      */
-    public static void getSkinData(UUID uuid, ResultCallBack<SkinData> callBack) {
-        getSkinDataAsync(uuid, (successful, result, exception) -> new BukkitRunnable() {
-            @Override
-            public void run() {
-                callBack.callBack(successful, result, exception);
-            }
-        }.runTask(plugin));
+    fun getSkinData(uuid: UUID, callBack: ResultCallBack<SkinData?>) {
+        getSkinDataAsync(uuid) { successful: Boolean, result: SkinData?, exception: Exception? ->
+            object : BukkitRunnable() {
+                override fun run() {
+                    callBack.callBack(successful, result, exception)
+                }
+            }.runTask(plugin)
+        }
     }
 
     /**
@@ -1828,355 +1727,367 @@ class MojangAPIUtil {
      * passed to the callback will be null.
      *
      * @param uuid
-     *            the uuid of the user
+     * the uuid of the user
      * @param callBack
-     *            the callback
+     * the callback
      */
-    @SuppressWarnings("unchecked")
-    public static void getSkinDataAsync(UUID uuid, ResultCallBack<SkinData> callBack) {
+    fun getSkinDataAsync(uuid: UUID, callBack: ResultCallBack<SkinData?>) {
         if (plugin == null) {
-            return;
+            return
         }
-        URL url;
-        try {
-            url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/"
-                    + uuid.toString().replace("-", "") + "?unsigned=false");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return;
+        val url: URL
+        url = try {
+            URL(
+                "https://sessionserver.mojang.com/session/minecraft/profile/"
+                        + uuid.toString().replace("-", "") + "?unsigned=false"
+            )
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
+            return
         }
-        makeAsyncGetRequest(url, (successful, response, exception, responseCode) -> {
+        makeAsyncGetRequest(url) { successful: Boolean, response: String?, exception: Exception?, responseCode: Int ->
             try {
                 if (successful && (responseCode == 200 || responseCode == 204)) {
                     if (responseCode == 204) {
-                        callBack.callBack(true, null, null);
-                        return;
+                        callBack.callBack(true, null, null)
+                        return@makeAsyncGetRequest
                     }
-                    JSONObject object = (JSONObject) PARSER.parse(response);
-                    JSONArray propertiesArray = (JSONArray) object.get("properties");
-                    String base64 = null;
-                    String signedBase64 = null;
+                    val `object` = PARSER.parse(response) as JSONObject
+                    val propertiesArray = `object`["properties"] as JSONArray
+                    var base64: String? = null
+                    var signedBase64: String? = null
                     // noinspection Duplicates
-                    for (JSONObject property : (List<JSONObject>) propertiesArray) {
-                        String name = (String) property.get("name");
-                        if (name.equals("textures")) {
-                            base64 = (String) property.get("value");
-                            signedBase64 = (String) property.get("signature");
+                    for (property in propertiesArray as List<JSONObject>) {
+                        val name = property["name"] as String
+                        if (name == "textures") {
+                            base64 = property["value"] as String?
+                            signedBase64 = property["signature"] as String?
                         }
                     }
                     if (base64 == null) {
-                        callBack.callBack(true, null, null);
-                        return;
+                        callBack.callBack(true, null, null)
+                        return@makeAsyncGetRequest
                     }
-                    String decodedBase64 = new String(Base64.getDecoder().decode(base64), "UTF-8");
-                    JSONObject base64json = (JSONObject) PARSER.parse(decodedBase64);
-                    long timeStamp = (long) base64json.get("timestamp");
-                    String profileName = (String) base64json.get("profileName");
-                    UUID profileId = getUUIDFromString((String) base64json.get("profileId"));
-                    JSONObject textures = (JSONObject) base64json.get("textures");
-                    String skinURL = null;
-                    String capeURL = null;
+                    val decodedBase64 = String(Base64.getDecoder().decode(base64), Charsets.UTF_8)
+                    val base64json = PARSER.parse(decodedBase64) as JSONObject
+                    val timeStamp = base64json["timestamp"] as Long
+                    val profileName = base64json["profileName"] as String
+                    val profileId = getUUIDFromString(base64json["profileId"] as String)
+                    val textures = base64json["textures"] as JSONObject
+                    var skinURL: String? = null
+                    var capeURL: String? = null
                     if (textures.containsKey("SKIN")) {
-                        JSONObject skinObject = (JSONObject) textures.get("SKIN");
-                        skinURL = (String) skinObject.get("url");
+                        val skinObject = textures["SKIN"] as JSONObject
+                        skinURL = skinObject["url"] as String?
                     }
                     if (textures.containsKey("CAPE")) {
-                        JSONObject capeObject = (JSONObject) textures.get("CAPE");
-                        capeURL = (String) capeObject.get("url");
+                        val capeObject = textures["CAPE"] as JSONObject
+                        capeURL = capeObject["url"] as String?
                     }
-                    callBack.callBack(true,
-                            new SkinData(profileId, profileName, skinURL, capeURL, timeStamp, base64, signedBase64),
-                            null);
+                    callBack.callBack(
+                        true,
+                        SkinData(profileId, profileName, skinURL, capeURL, timeStamp, base64, signedBase64),
+                        null
+                    )
                 } else {
                     if (exception != null) {
-                        callBack.callBack(false, null, exception);
+                        callBack.callBack(false, null, exception)
                     } else {
-                        callBack.callBack(false, null,
-                                new IOException("Failed to obtain Mojang data! Response code: " + responseCode));
+                        callBack.callBack(
+                            false, null,
+                            IOException("Failed to obtain Mojang data! Response code: $responseCode")
+                        )
                     }
                 }
-            } catch (Exception e) {
-                callBack.callBack(false, null, e);
+            } catch (e: Exception) {
+                callBack.callBack(false, null, e)
             }
-        });
-    }
-
-    public static class SkinData {
-        private UUID uuid;
-        private String name;
-        private String skinURL;
-        private String capeURL;
-        private long timeStamp;
-        private String base64;
-        private String signedBase64;
-
-        public SkinData(UUID uuid, String name, String skinURL, String capeURL, long timeStamp, String base64,
-                        String signedBase64) {
-            this.uuid = uuid;
-            this.name = name;
-            this.skinURL = skinURL;
-            this.capeURL = capeURL;
-            this.timeStamp = timeStamp;
-            this.base64 = base64;
-            this.signedBase64 = signedBase64;
-        }
-
-        public UUID getUUID() {
-            return uuid;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean hasSkinURL() {
-            return skinURL != null;
-        }
-
-        public String getSkinURL() {
-            return skinURL;
-        }
-
-        public boolean hasCapeURL() {
-            return capeURL != null;
-        }
-
-        public String getCapeURL() {
-            return capeURL;
-        }
-
-        public long getTimeStamp() {
-            return timeStamp;
-        }
-
-        public String getBase64() {
-            return base64;
-        }
-
-        public boolean hasSignedBase64() {
-            return signedBase64 != null;
-        }
-
-        public String getSignedBase64() {
-            return signedBase64;
-        }
-
-        @Override
-        public String toString() {
-            return "SkinData{uuid=" + uuid + ",name=" + name + ",skinURL=" + skinURL + ",capeURL=" + capeURL
-                    + ",timeStamp=" + timeStamp + ",base64=" + base64 + ",signedBase64=" + signedBase64 + "}";
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof SkinData)) {
-                return false;
-            }
-            SkinData skinData = (SkinData) obj;
-            return this.uuid.equals(skinData.uuid) && this.name.equals(skinData.name)
-                    && (this.skinURL == null ? skinData.skinURL == null : this.skinURL.equals(skinData.skinURL))
-                    && (this.capeURL == null ? skinData.capeURL == null : this.capeURL.equals(skinData.skinURL))
-                    && this.timeStamp == skinData.timeStamp && this.base64.equals(skinData.base64)
-                    && (this.signedBase64 == null ? skinData.signedBase64 == null
-                    : this.signedBase64.equals(skinData.signedBase64));
-
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(uuid, name, skinURL, capeURL, timeStamp, base64, signedBase64);
         }
     }
 
-    private static RequestResult makeSyncGetRequest(URL url) {
+    private fun makeSyncGetRequest(url: URL): RequestResult? {
         if (plugin == null) {
-            return null;
+            return null
         }
-        StringBuilder response = new StringBuilder();
+        val response = StringBuilder()
         try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-            // noinspection Duplicates
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line = reader.readLine();
+            val connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+            BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                var line = reader.readLine()
                 while (line != null) {
-                    response.append(line);
-                    line = reader.readLine();
+                    response.append(line)
+                    line = reader.readLine()
                 }
-                RequestResult result = new RequestResult();
-                result.successful = true;
-                result.responseCode = connection.getResponseCode();
-                result.response = response.toString();
-                return result;
+                val result = RequestResult()
+                result.successful = true
+                result.responseCode = connection.responseCode
+                result.response = response.toString()
+                return result
             }
-        } catch (IOException e) {
-            RequestResult result = new RequestResult();
-            result.exception = e;
-            result.successful = false;
-            return result;
+        } catch (e: IOException) {
+            val result = RequestResult()
+            result.exception = e
+            result.successful = false
+            return result
         }
     }
 
-    private static void makeAsyncGetRequest(URL url, RequestCallBack asyncCallBack) {
+    private fun makeAsyncGetRequest(url: URL?, asyncCallBack: RequestCallBack) {
         if (plugin == null) {
-            return;
+            return
         }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                StringBuilder response = new StringBuilder();
+        object : BukkitRunnable() {
+            override fun run() {
+                val response = StringBuilder()
                 try {
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.connect();
-                    // noinspection Duplicates
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()))) {
-                        String line = reader.readLine();
+                    val connection = url!!.openConnection() as HttpURLConnection
+                    connection.connect()
+                    BufferedReader(
+                        InputStreamReader(connection.inputStream)
+                    ).use { reader ->
+                        var line = reader.readLine()
                         while (line != null) {
-                            response.append(line);
-                            line = reader.readLine();
+                            response.append(line)
+                            line = reader.readLine()
                         }
-                        asyncCallBack.callBack(true, response.toString(), null, connection.getResponseCode());
+                        asyncCallBack.callBack(true, response.toString(), null, connection.responseCode)
                     }
-                } catch (Exception e) {
-                    asyncCallBack.callBack(false, response.toString(), e, -1);
+                } catch (e: Exception) {
+                    asyncCallBack.callBack(false, response.toString(), e, -1)
                 }
             }
-        }.runTaskAsynchronously(plugin);
+        }.runTaskAsynchronously(plugin)
     }
 
-    private static RequestResult makeSyncPostRequest(URL url, String payload) {
+    private fun makeSyncPostRequest(url: URL?, payload: String): RequestResult? {
         if (plugin == null) {
-            return null;
+            return null
         }
-        StringBuilder response = new StringBuilder();
+        val response = StringBuilder()
         try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.connect();
-            try (PrintWriter writer = new PrintWriter(connection.getOutputStream())) {
-                writer.write(payload);
-            }
-            // noinspection Duplicates
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line = reader.readLine();
+            val connection = url!!.openConnection() as HttpURLConnection
+            connection.doOutput = true
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.connect()
+            PrintWriter(connection.outputStream).use { writer -> writer.write(payload) }
+            BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                var line = reader.readLine()
                 while (line != null) {
-                    response.append(line);
-                    line = reader.readLine();
+                    response.append(line)
+                    line = reader.readLine()
                 }
-                RequestResult result = new RequestResult();
-                result.successful = true;
-                result.responseCode = connection.getResponseCode();
-                result.response = response.toString();
-                return result;
+                val result = RequestResult()
+                result.successful = true
+                result.responseCode = connection.responseCode
+                result.response = response.toString()
+                return result
             }
-        } catch (IOException e) {
-            RequestResult result = new RequestResult();
-            result.successful = false;
-            result.exception = e;
-            return result;
+        } catch (e: IOException) {
+            val result = RequestResult()
+            result.successful = false
+            result.exception = e
+            return result
         }
     }
 
-    private static void makeAsyncPostRequest(URL url, String payload, RequestCallBack asyncCallBack) {
+    private fun makeAsyncPostRequest(url: URL?, payload: String, asyncCallBack: RequestCallBack) {
         if (plugin == null) {
-            return;
+            return
         }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                StringBuilder response = new StringBuilder();
+        object : BukkitRunnable() {
+            override fun run() {
+                val response = StringBuilder()
                 try {
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoOutput(true);
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.connect();
-                    try (PrintWriter writer = new PrintWriter(connection.getOutputStream())) {
-                        writer.write(payload);
-                    }
-                    // noinspection Duplicates
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()))) {
-                        String line = reader.readLine();
+                    val connection = url!!.openConnection() as HttpURLConnection
+                    connection.doOutput = true
+                    connection.requestMethod = "POST"
+                    connection.setRequestProperty("Content-Type", "application/json")
+                    connection.connect()
+                    PrintWriter(connection.outputStream).use { writer -> writer.write(payload) }
+                    BufferedReader(
+                        InputStreamReader(connection.inputStream)
+                    ).use { reader ->
+                        var line = reader.readLine()
                         while (line != null) {
-                            response.append(line);
-                            line = reader.readLine();
+                            response.append(line)
+                            line = reader.readLine()
                         }
-                        asyncCallBack.callBack(true, response.toString(), null, connection.getResponseCode());
+                        asyncCallBack.callBack(true, response.toString(), null, connection.responseCode)
                     }
-                } catch (Exception e) {
-                    asyncCallBack.callBack(false, response.toString(), e, -1);
+                } catch (e: Exception) {
+                    asyncCallBack.callBack(false, response.toString(), e, -1)
                 }
             }
-        }.runTaskAsynchronously(plugin);
+        }.runTaskAsynchronously(plugin)
     }
 
-    public static UUID getUUIDFromString(String string) {
-        String uuidString = string.substring(0, 8) + "-" + string.substring(8, 12) + "-" + string.substring(12, 16)
-                + "-" + string.substring(16, 20) + "-" + string.substring(20);
-        return UUID.fromString(uuidString);
+    fun getUUIDFromString(string: String): UUID {
+        val uuidString = (string.substring(0, 8) + "-" + string.substring(8, 12) + "-" + string.substring(12, 16)
+                + "-" + string.substring(16, 20) + "-" + string.substring(20))
+        return UUID.fromString(uuidString)
     }
 
-    @FunctionalInterface
-    private interface RequestCallBack {
-        void callBack(boolean successful, String response, Exception exception, int responseCode);
+    /**
+     * The statuses of Mojang's API used by getAPIStatus().
+     */
+    enum class APIStatus {
+        RED, YELLOW, GREEN;
+
+        companion object {
+            fun fromString(string: String): APIStatus {
+                return when (string) {
+                    "red" -> RED
+                    "yellow" -> YELLOW
+                    "green" -> GREEN
+                    else -> throw IllegalArgumentException("Unknown status: $string")
+                }
+            }
+        }
     }
 
-    private static class RequestResult {
-        boolean successful;
-        String response;
-        Exception exception;
-        int responseCode;
+    class UUIDAtTime(val name: String, val uUID: UUID) {
+        override fun toString(): String {
+            return "UUIDAtTime{name=" + name + ",uuid=" + uUID + "}"
+        }
+
+        override fun equals(obj: Any?): Boolean {
+            if (obj === this) {
+                return true
+            }
+            if (obj !is UUIDAtTime) {
+                return false
+            }
+            val uuidAtTime = obj
+            return name == uuidAtTime.name && uUID == uuidAtTime.uUID
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(name, uUID)
+        }
+    }
+
+    class Profile internal constructor(val uUID: UUID, val name: String, val isLegacy: Boolean, val isUnpaid: Boolean) {
+        override fun toString(): String {
+            return "Profile{uuid=" + uUID + ", name=" + name + ", legacy=" + isLegacy + ", unpaid=" + isUnpaid + "}"
+        }
+
+        override fun equals(obj: Any?): Boolean {
+            if (obj === this) {
+                return true
+            }
+            if (obj !is Profile) {
+                return false
+            }
+            val otherProfile = obj
+            return uUID == otherProfile.uUID && name == otherProfile.name && isLegacy == otherProfile.isLegacy && isUnpaid == otherProfile.isUnpaid
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(uUID, name, isLegacy, isUnpaid)
+        }
+    }
+
+    class SkinData(
+        val uUID: UUID,
+        val name: String,
+        val skinURL: String?,
+        val capeURL: String?,
+        val timeStamp: Long,
+        val base64: String,
+        val signedBase64: String?
+    ) {
+        fun hasSkinURL(): Boolean {
+            return skinURL != null
+        }
+
+        fun hasCapeURL(): Boolean {
+            return capeURL != null
+        }
+
+        fun hasSignedBase64(): Boolean {
+            return signedBase64 != null
+        }
+
+        override fun toString(): String {
+            return ("SkinData{uuid=" + uUID + ",name=" + name + ",skinURL=" + skinURL + ",capeURL=" + capeURL
+                    + ",timeStamp=" + timeStamp + ",base64=" + base64 + ",signedBase64=" + signedBase64 + "}")
+        }
+
+        override fun equals(obj: Any?): Boolean {
+            if (obj === this) {
+                return true
+            }
+            if (obj !is SkinData) {
+                return false
+            }
+            val skinData = obj
+            return (uUID == skinData.uUID && name == skinData.name && (if (skinURL == null) skinData.skinURL == null else skinURL == skinData.skinURL)
+                    && (if (capeURL == null) skinData.capeURL == null else capeURL == skinData.skinURL)
+                    && timeStamp == skinData.timeStamp && base64 == skinData.base64 && if (signedBase64 == null) skinData.signedBase64 == null else signedBase64 == skinData.signedBase64)
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(uUID, name, skinURL, capeURL, timeStamp, base64, signedBase64)
+        }
+    }
+
+    private fun interface RequestCallBack {
+        fun callBack(successful: Boolean, response: String?, exception: Exception?, responseCode: Int)
+    }
+
+    private class RequestResult {
+        var successful = false
+        var response: String? = null
+        var exception: Exception? = null
+        var responseCode = 0
     }
 
     /**
      * The callback interface
-     * <p>
+     *
+     *
      * Once some data is received (or an error is thrown) the callBack method is
      * fired with the following data:
-     * <p>
+     *
+     *
      * boolean successful - If the data arrived and was interpreted correctly.
-     * <p>
+     *
+     *
      * <T> result - The data. Only present if successful is true, otherwise null.
-     * <p>
+    </T> *
+     *
      * Exception e - The exception. Only present if successful is false, otherwise
      * null.
-     * <p>
+     *
+     *
      * This interface is annotated with @FunctionalInterface, which allows for
      * instantiation using lambda expressions.
      */
-    @FunctionalInterface
-    public interface ResultCallBack<T> {
-        void callBack(boolean successful, T result, Exception exception);
+    fun interface ResultCallBack<T> {
+        fun callBack(successful: Boolean, result: T, exception: Exception?)
     }
 
-    public static class Result<T> {
-        private T value;
-        private boolean successful;
-        private Exception exception;
-
-        public Result(T value, boolean successful, Exception exception) {
-            this.value = value;
-            this.successful = successful;
-            this.exception = exception;
+    class Result<T>(val value: T, private val successful: Boolean, val exception: Exception?) {
+        fun wasSuccessful(): Boolean {
+            return successful
         }
+    }
 
-        public T getValue() {
-            return value;
+    init {
+        for (plugin in Bukkit.getPluginManager().plugins) {
+            if (plugin::class.java.getProtectionDomain().getCodeSource()
+                == MojangAPIUtil::class.java.protectionDomain.codeSource
+            ) {
+                MojangAPIUtil.plugin = plugin
+            }
         }
-
-        public boolean wasSuccessful() {
-            return successful;
-        }
-
-        public Exception getException() {
-            return exception;
+        try {
+            API_STATUS_URL = URL("https://status.mojang.com/check")
+            GET_UUID_URL = URL("https://api.mojang.com/profiles/minecraft")
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
         }
     }
 }
