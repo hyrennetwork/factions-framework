@@ -222,7 +222,7 @@ class PlayerList(player: Player, size: Int) {
             PROPERTY = Property::class.java
             PROPERTY_CONSTRUCTOR = ReflectionUtil.getConstructor(
                 PROPERTY, String::class.java, String::class.java, String::class.java
-            ).get() as Constructor<*>
+            )
 
             PROPERTY_MAP = PropertyMap::class.java
 
@@ -428,8 +428,8 @@ class PlayerList(player: Player, size: Int) {
      * @param player
      */
     fun removePlayer(player: Player) {
-        val packet =
-            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        val packet = ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS))
+
         if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
             val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
             val gameProfile =
@@ -470,13 +470,12 @@ class PlayerList(player: Player, size: Int) {
      * @param id
      */
     private fun removeCustomTab(id: Int, remove: Boolean) {
-        val packet =
-            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        val packet = ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS))
+
         if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
             val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
             for (playerData in ArrayList(datas)) {
-                val gameProfile =
-                    GAMEPROFILECLASS!!.cast(ReflectionUtil.invokeMethod(playerData, "a", arrayOfNulls<Class<*>?>(0)))
+                val gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil.invokeMethod(playerData, "a", arrayOfNulls<Class<*>?>(0)))
                 val getname = ReflectionUtil.invokeMethod(gameProfile, "getName", null) as String?
                 if (getname!!.startsWith(getNameFromID(id))) {
                     tabs[getIDFromName(getname)] = ""
@@ -525,18 +524,6 @@ class PlayerList(player: Player, size: Int) {
         addExistingPlayer(id, player.name, player)
     }
 
-    /**
-     * Use this to add a new player to the list
-     *
-     * @param id
-     * @param name
-     */
-    @Deprecated("")
-//        (
-//        """If all 80 slots have been taken, new values will not be shown and
-//                  may have the potential to go out of the registered bounds. Use
-//                  the """ updateSlot() " method to change a slot."
-//    )
     private fun addValue(id: Int, name: String, shouldUseSkin: Boolean) {
         val uuid = if (name.length > 0 && Bukkit.getOfflinePlayer(name)
                 .hasPlayedBefore()
@@ -544,21 +531,9 @@ class PlayerList(player: Player, size: Int) {
         this.addValue(id, name, uuid, shouldUseSkin)
     }
 
-    /**
-     * Use this to add a new player to the list
-     *
-     * @param id
-     * @param name
-     */
-    @Deprecated("")
-//        (
-//        """If all 80 slots have been taken, new values will not be shown and
-//                  may have the potential to go out of the registered bounds. Use
-//                  the """ updateSlot() " method to change a slot."
-//    )
     private fun addValue(id: Int, name: String, uuid: UUID, updateProfToAddCustomSkin: Boolean) {
-        val packet =
-            ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS).get() as Constructor<*>)
+        val packet = ReflectionUtil.instantiate(ReflectionUtil.getConstructor(PACKET_PLAYER_INFO_CLASS))
+
         if (ReflectionUtil.getInstanceField(packet, "b") is List<*>) {
             val players = ReflectionUtil.getInstanceField(packet, "b") as MutableList<Any?>?
             val gameProfile = if (Bukkit.getPlayer(uuid) != null) ReflectionUtil.invokeMethod(
