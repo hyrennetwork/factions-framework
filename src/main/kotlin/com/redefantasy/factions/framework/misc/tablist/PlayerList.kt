@@ -5,6 +5,7 @@ import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
+import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
@@ -71,6 +72,8 @@ class PlayerList(
     fun removePlayer(player: Player) {
         val packet = PacketPlayOutPlayerInfo()
 
+        println("remover")
+
         val gameProfile = (player as CraftPlayer).handle.profile
 
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
@@ -80,12 +83,18 @@ class PlayerList(
             null
         )
 
+        println("opa")
+
         packet.channels.add(CHANNEL_NAME)
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
         packet.b.add(playerInfoData)
 
+        println("dale")
+
         player.sendPacket(packet)
+
+        Bukkit.getOnlinePlayers().forEach { it.sendPacket(packet) }
     }
 
 }
