@@ -4,7 +4,6 @@ import com.redefantasy.core.shared.echo.api.listener.EchoListener
 import com.redefantasy.core.shared.echo.packets.UserPunishedPacket
 import com.redefantasy.factions.framework.FactionsFrameworkConstants
 import com.redefantasy.factions.framework.FactionsFrameworkPlugin
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
 
@@ -51,17 +50,11 @@ class UserPunishedEchoPacketListener : EchoListener {
             /**
              * Outdated
              */
-            Bukkit.getOnlinePlayers().forEach {
-                val spigot = it.spigot()
-
-                spigot.sendMessage(
-                    *ComponentBuilder()
-                        .append("\n")
-                        .append("§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
-                        .append("\n")
-                        .create()
-                )
-            }
+            Bukkit.broadcastMessage(
+                    "\n" +
+                    "§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna." +
+                    "\n"
+            )
 
             mPlayers.forEach {
                 val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
