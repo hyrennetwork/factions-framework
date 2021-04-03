@@ -30,7 +30,7 @@ class PlayerList(
         PacketPlayOutPlayerInfo.PlayerInfoData(
             GameProfile(
                 UUID.randomUUID(),
-                SEQUENCE_PREFIX.next()
+                "__${SEQUENCE_PREFIX.next()}"
             ),
             0,
             WorldSettings.EnumGamemode.NOT_SET,
