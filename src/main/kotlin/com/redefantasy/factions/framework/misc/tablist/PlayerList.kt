@@ -21,24 +21,28 @@ class PlayerList(
 
     private val SEQUENCE_PREFIX = SequencePrefix()
 
-    private val PLAYERS = MutableList(size) {
-        PacketPlayOutPlayerInfo.PlayerInfoData(
-            GameProfile(
-                UUID.randomUUID(),
-                "__${SEQUENCE_PREFIX.next()}"
-            ),
-            0,
-            WorldSettings.EnumGamemode.NOT_SET,
-            CraftChatMessage.fromString(
-                "§1"
-            )[0]
-        )
-    }
+    private val PLAYERS = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
 
     companion object {
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
 
+    }
+
+    init {
+        for (i in 0..size) this.PLAYERS.add(
+            PacketPlayOutPlayerInfo.PlayerInfoData(
+                GameProfile(
+                    UUID.randomUUID(),
+                    "__${SEQUENCE_PREFIX.next()}"
+                ),
+                0,
+                WorldSettings.EnumGamemode.NOT_SET,
+                CraftChatMessage.fromString(
+                    "§0"
+                )[0]
+            )
+        )
     }
 
     fun update(
