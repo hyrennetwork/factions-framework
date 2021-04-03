@@ -5,6 +5,7 @@ import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
+import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
@@ -41,7 +42,7 @@ class PlayerList(
     }
 
     init {
-        this.removePlayer(player)
+        this.clearPlayers()
     }
 
     fun update(
@@ -70,6 +71,12 @@ class PlayerList(
         packet.b = PLAYERS
 
         player.sendPacket(packet)
+    }
+
+    private fun clearPlayers() {
+        Bukkit.getOnlinePlayers().forEach {
+            this.removePlayer(it)
+        }
     }
 
     fun removePlayer(player: Player) {
