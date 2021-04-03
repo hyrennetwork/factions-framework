@@ -22,19 +22,21 @@ class UserPunishedEchoPacketListener : EchoListener {
         if (mPlayer !== null) {
             val getName = mPlayer::class.java.superclass.getDeclaredMethod("getName")
 
-            getName.isAccessible = true
+//            getName.isAccessible = true
 
             val name = getName.invoke(mPlayer) as String
 
+            println("MPlayer: $name")
+
             val getFaction = mPlayer::class.java.getDeclaredMethod("getFaction")
 
-            getFaction.isAccessible = true
+//            getFaction.isAccessible = true
 
             val faction = getFaction.invoke(mPlayer) ?: return
 
             val getId = faction::class.java.superclass.superclass.getMethod("getId")
 
-            getId.isAccessible = true
+//            getId.isAccessible = true
 
             val factionId = getId.invoke(faction) ?: return
 
@@ -42,28 +44,19 @@ class UserPunishedEchoPacketListener : EchoListener {
 
             val getMPlayers = faction::class.java.getDeclaredMethod("getMPlayers")
 
-            getMPlayers.isAccessible = true
+//            getMPlayers.isAccessible = true
 
             val mPlayers = getMPlayers.invoke(faction) as List<Any?>
 
             val economyClass = Class.forName("net.milkbowl.vault.economy.Economy")
-
-            economyClass.declaredMethods.forEach {
-                println("Método: ${it.name}")
-            }
-
             val registeredServiceProvider = Bukkit.getServer().servicesManager.getRegistration(economyClass).provider
-
-            registeredServiceProvider::class.java.declaredMethods.forEach {
-                println("Método 2: ${it.name}")
-            }
 
             val getBalance = registeredServiceProvider::class.java.getMethod("getBalance")
 
             getBalance.isAccessible = true
 
             mPlayers.forEach {
-                val balance = getBalance.invoke(registeredServiceProvider, name) as Double
+                val balance = getBalance.invoke(economyClass, name) as Double
 
                 println("$name -> Balanço: $balance")
 
