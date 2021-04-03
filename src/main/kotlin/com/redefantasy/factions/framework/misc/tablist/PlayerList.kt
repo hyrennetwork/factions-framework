@@ -16,7 +16,7 @@ import java.util.*
  */
 class PlayerList(
     private val player: Player,
-    size: Int = 80
+    private val size: Int = 80
 ) {
 
     private val SEQUENCE_PREFIX = SequencePrefix()
@@ -29,8 +29,8 @@ class PlayerList(
 
     }
 
-    init {
-        for (i in 0..size) this.PLAYERS.add(
+    fun init() {
+        for (i in 0 until size) this.PLAYERS.add(
             PacketPlayOutPlayerInfo.PlayerInfoData(
                 GameProfile(
                     UUID.randomUUID(),
@@ -39,7 +39,7 @@ class PlayerList(
                 0,
                 WorldSettings.EnumGamemode.NOT_SET,
                 CraftChatMessage.fromString(
-                    "§1"
+                    "§0"
                 )[0]
             )
         )
