@@ -20,7 +20,6 @@ class UserPunishedEchoPacketListener : EchoListener {
         val mPlayer = FactionsFrameworkPlugin.FACTIONS_API.getMPlayer(userId)
 
         if (mPlayer !== null) {
-            val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(mPlayer) as String
             val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
             val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) ?: return
 
@@ -36,8 +35,15 @@ class UserPunishedEchoPacketListener : EchoListener {
                 "getBalance",
                 String::class.java
             )
+            val withdrawPlayer = registeredServiceProvider::class.java.getDeclaredMethod(
+                "withdrawPlayer",
+                String::class.java,
+                Double::class.java
+            )
 
             mPlayers.forEach {
+                val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
+
                 val balance = getBalance.invoke(registeredServiceProvider, name) as Double
 
                 println("$name -> Balanço: $balance")
