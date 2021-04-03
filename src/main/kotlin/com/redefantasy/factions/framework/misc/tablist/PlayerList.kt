@@ -24,7 +24,7 @@ class PlayerList(
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     )
 
-    private val PLAYERS = MutableList(80) {
+    private val PLAYERS = MutableList(81) {
         PacketPlayOutPlayerInfo.PlayerInfoData(
             GameProfile(
                 UUID.randomUUID(),
