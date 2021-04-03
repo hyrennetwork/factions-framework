@@ -40,7 +40,7 @@ class PlayerList private constructor(
         )
     }
 
-    val PACKET: PacketPlayOutPlayerInfo = PacketPlayOutPlayerInfo()
+    var PACKET: PacketPlayOutPlayerInfo = PacketPlayOutPlayerInfo()
 
     private fun generateHiddenString(size: Int = 4): String {
         val stringBuilder = StringBuilder()
@@ -64,15 +64,17 @@ class PlayerList private constructor(
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
 
-        fun getPlayerList(player: Player) = PLAYER_LIST.getOrDefault(
-            player.uniqueId,
-            PlayerList(player)
-        )
+        fun getPlayerList(player: Player): PlayerList {
+            val playerList = PLAYER_LIST.getOrDefault(
+                player.uniqueId,
+                PlayerList(player)
+            )
 
-    }
+            playerList.PACKET = PacketPlayOutPlayerInfo()
 
-    init {
-        PACKET.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
+            return playerList
+        }
+
     }
 
     fun update(
