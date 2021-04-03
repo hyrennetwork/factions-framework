@@ -65,7 +65,10 @@ class UserPunishedEchoPacketListener : EchoListener {
                     registeredServiceProvider,
                     name,
                     if ((balance - 25.0 * balance / 100.0) <= 0.0) {
+                        val balance = 0.0
+
                         println("Novo balanço: $balance")
+
                         balance
                     } else {
                         val balance = 25.0 * balance / 100.0
