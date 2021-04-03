@@ -17,7 +17,7 @@ import java.util.*
  */
 class PlayerList(
     private val player: Player,
-    size: Int = 80
+    private val size: Int = 80
 ) {
 
     private val COLOR_DECODER = arrayOf(
@@ -67,7 +67,7 @@ class PlayerList(
 
         val _name = this.getNameFromIndex(index) + name
 
-        for (i in 0 until index - 1) {
+        for (i in size downTo index - 1) {
             SEQUENCE_PREFIX.next()
         }
 
