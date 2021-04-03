@@ -24,6 +24,20 @@ class PlayerList(
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     )
 
+    private val PLAYERS = MutableList(80) {
+        PacketPlayOutPlayerInfo.PlayerInfoData(
+            GameProfile(
+                UUID.randomUUID(),
+                this.getNameFromIndex(it) + "",
+            ),
+            0,
+            WorldSettings.EnumGamemode.NOT_SET,
+            CraftChatMessage.fromString(
+                this.getNameFromIndex(it) + ""
+            )[0]
+        )
+    }
+
     companion object {
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
@@ -48,8 +62,6 @@ class PlayerList(
     ) {
         val packet = PacketPlayOutPlayerInfo()
 
-        val players = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
-
         val gameProfile = (Bukkit.getPlayerExact(name) as CraftPlayer?)?.handle?.profile ?: GameProfile(
             uuid,
             this.getNameFromIndex(index) + name,
@@ -64,12 +76,12 @@ class PlayerList(
             )[0]
         )
 
-        players.add(index, playerInfoData)
+        PLAYERS[index] = playerInfoData
 
         packet.channels.add(CHANNEL_NAME)
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
-        packet.b = players
+        packet.b = PLAYERS
 
         player.sendPacket(packet)
     }
