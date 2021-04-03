@@ -6,9 +6,6 @@ import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
-import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -30,9 +27,7 @@ class PlayerList(
             ),
             0,
             WorldSettings.EnumGamemode.NOT_SET,
-            CraftChatMessage.fromString(
-                "§0"
-            )[0]
+            ChatComponentText("§0")
         )
     }
 
@@ -44,7 +39,7 @@ class PlayerList(
 
     fun init() {
         for (i in 0 until size)
-            this.update(i, "§1")
+            this.update(i, "§1§2")
     }
 
     fun update(
@@ -53,23 +48,15 @@ class PlayerList(
     ) {
         val packet = PacketPlayOutPlayerInfo()
 
-        val playerInfoData = /*PacketPlayOutPlayerInfo.PlayerInfoData(
+        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
             GameProfile(
                 UUID.randomUUID(),
                 SEQUENCE_PREFIX.next()
             ),
             0,
             WorldSettings.EnumGamemode.NOT_SET,
-            CraftChatMessage.fromString(
-                text
-            )[0]
-        )*/PLAYERS[index]
-
-        val field = playerInfoData::class.java.getDeclaredField("e")
-
-        field.isAccessible = true
-
-        field.set(playerInfoData, ChatComponentText(text))
+            ChatComponentText(text)
+        )
 
         PLAYERS[index] = playerInfoData
 
@@ -79,34 +66,6 @@ class PlayerList(
         packet.b = PLAYERS
 
         player.sendPacket(packet)
-    }
-
-    fun removePlayer(player: Player) {
-        val packet = PacketPlayOutPlayerInfo()
-
-        println("remover")
-
-        val gameProfile = (player as CraftPlayer).handle.profile
-
-        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
-            gameProfile,
-            0,
-            WorldSettings.EnumGamemode.NOT_SET,
-            null
-        )
-
-        println("opa")
-
-        packet.channels.add(CHANNEL_NAME)
-
-        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
-        packet.b.add(playerInfoData)
-
-        println("dale")
-
-        player.sendPacket(packet)
-
-        Bukkit.getOnlinePlayers().forEach { it.sendPacket(packet) }
     }
 
 }
