@@ -26,21 +26,25 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(PlayerList.CHANNEL_NAME)) {
-                        val playerList = PlayerList.getPlayerList(player)
+                        try {
+                            val playerList = PlayerList.getPlayerList(player)
 
-                        playerList.removePlayer(player)
+                            playerList.removePlayer(player)
 
-                        playerList.update(0, "§e§lMINHA FACÇÃO")
-                        playerList.update(1, "§e[STF] STAFF")
-                        playerList.update(2, "§1")
-                        playerList.update(3, "§a• §6[Master] #Gutyerrez")
-                        playerList.update(4, "§a• §6[Master] *ImRamon")
-                        playerList.update(5, "§7• [Master] +VICTORBBBBR")
+                            playerList.update(0, "§e§lMINHA FACÇÃO")
+                            playerList.update(1, "§e[STF] STAFF")
+                            playerList.update(2, "§1")
+                            playerList.update(3, "§a• §6[Master] #Gutyerrez")
+                            playerList.update(4, "§a• §6[Master] *ImRamon")
+                            playerList.update(5, "§7• [Master] +VICTORBBBBR")
 
-                        for (i in 6 until 16)
-                            playerList.update(i, "§7• -${RandomStringUtils.randomAlphabetic(8)}")
+                            for (i in 6 until 16)
+                                playerList.update(i, "§7• -${RandomStringUtils.randomAlphabetic(8)}")
 
-                        event.packet = playerList.PACKET
+                            event.packet = playerList.PACKET
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
 
