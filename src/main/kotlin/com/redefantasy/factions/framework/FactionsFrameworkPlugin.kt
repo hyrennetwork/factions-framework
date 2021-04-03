@@ -58,7 +58,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                 ) {
                     val packet = event.packet
 
-                    if (packet is PacketPlayOutPlayerInfo) {
+                    if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(PlayerList.CHANNEL_NAME)) {
                         when (packet.a) {
                             PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER -> {
                                 val _packet = PacketPlayOutPlayerInfo()
