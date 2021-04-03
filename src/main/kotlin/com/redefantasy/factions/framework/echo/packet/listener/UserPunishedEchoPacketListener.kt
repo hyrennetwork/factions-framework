@@ -53,7 +53,7 @@ class UserPunishedEchoPacketListener : EchoListener {
             Bukkit.broadcastMessage(
                     "\n" +
                     "§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna." +
-                    "\n"
+                    "\n\n"
             )
 
             mPlayers.forEach {
@@ -65,13 +65,9 @@ class UserPunishedEchoPacketListener : EchoListener {
                     registeredServiceProvider,
                     name,
                     if ((balance - 25.0 * balance / 100.0) <= 0.0) {
-                        val balance = 0.0
-
-                        println("Novo balanço: $balance")
-
                         balance
                     } else {
-                        val balance = balance - (25.0 * balance / 100.0)
+                        val balance = balance % (balance - (25.0 * balance / 100.0))
 
                         println("Balanço corrigido: $balance")
 
