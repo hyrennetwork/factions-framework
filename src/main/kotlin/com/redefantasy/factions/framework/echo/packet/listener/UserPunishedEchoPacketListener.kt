@@ -4,6 +4,7 @@ import com.redefantasy.core.shared.echo.api.listener.EchoListener
 import com.redefantasy.core.shared.echo.packets.UserPunishedPacket
 import com.redefantasy.factions.framework.FactionsFrameworkConstants
 import com.redefantasy.factions.framework.FactionsFrameworkPlugin
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
 
@@ -21,7 +22,11 @@ class UserPunishedEchoPacketListener : EchoListener {
 
         if (mPlayer !== null) {
             val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
-            val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) ?: return
+
+            val factionId =
+                faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
+            val factionTag = faction::class.java.getMethod("getTag").invoke(faction) as String
+            val factionName = faction::class.java.getMethod("getName").invoke(faction) as String
 
             if (FactionsFrameworkConstants.IGNORED_FACTION_IDS.contains(factionId)) return
 
@@ -41,16 +46,35 @@ class UserPunishedEchoPacketListener : EchoListener {
                 Double::class.java
             )
 
+            val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(mPlayer) as String
+
+            /**
+             * Outdated
+             */
+            Bukkit.getOnlinePlayers().forEach {
+                val spigot = it.spigot()
+
+                spigot.sendMessage(
+                    *ComponentBuilder()
+                        .append("\n")
+                        .append("§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
+                        .append("\n")
+                        .create()
+                )
+            }
+
             mPlayers.forEach {
                 val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
 
                 val balance = getBalance.invoke(registeredServiceProvider, name) as Double
 
-                println("$name -> Balanço: $balance")
-
-                var newBalance = balance - (30.0 * balance / 100.0)
-
-                println("$name -> Novo balanço: $newBalance")
+                withdrawPlayer.invoke(
+                    registeredServiceProvider,
+                    name,
+                    if ((balance - 25.0 * balance / 100.0) <= 0) {
+                        balance
+                    } else 25.0 * balance / 100.0
+                )
             }
         }
     }
