@@ -71,7 +71,9 @@ class PlayerList(
             SEQUENCE_PREFIX.next()
         }
 
-        val prefix = SEQUENCE_PREFIX.next()
+        val prefix = "__${SEQUENCE_PREFIX.next()}"
+
+        println("Slot $index --> $prefix")
 
         val gameProfile = (Bukkit.getPlayerExact(name) as CraftPlayer?)?.handle?.profile ?: GameProfile(
             uuid,
