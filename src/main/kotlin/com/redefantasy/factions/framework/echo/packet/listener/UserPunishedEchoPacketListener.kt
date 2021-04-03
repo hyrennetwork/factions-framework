@@ -48,9 +48,17 @@ class UserPunishedEchoPacketListener : EchoListener {
 
             val economyClass = Class.forName("net.milkbowl.vault.economy.Economy")
 
+            economyClass.declaredMethods.forEach {
+                println("Método: ${it.name}")
+            }
+
             val registeredServiceProvider = Bukkit.getServer().servicesManager.getRegistration(economyClass).provider
 
-            val getBalance = economyClass.getMethod("getBalance")
+            registeredServiceProvider::class.java.declaredMethods.forEach {
+                println("Método 2: ${it.name}")
+            }
+
+            val getBalance = registeredServiceProvider::class.java.getMethod("getBalance")
 
             getBalance.isAccessible = true
 
