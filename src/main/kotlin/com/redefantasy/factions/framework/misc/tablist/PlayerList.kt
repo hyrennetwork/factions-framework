@@ -73,7 +73,7 @@ class PlayerList(
         player.sendPacket(packet)
     }
 
-    private fun remove(player: Player) {
+    fun removePlayer(player: Player) {
         val packet = PacketPlayOutPlayerInfo()
 
         val gameProfile = (player as CraftPlayer).handle.profile

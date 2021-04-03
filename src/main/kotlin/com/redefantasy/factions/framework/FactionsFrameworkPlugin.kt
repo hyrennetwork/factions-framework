@@ -29,6 +29,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     val playerList = PlayerList(player)
 
+                    playerList.removePlayer(player)
+
                     playerList.update(0, "§e§lMINHA FACÇÃO")
                     playerList.update(1, "§e[STF] STAFF")
                     playerList.update(3, "§a• §6[Master] #Gutyerrez")
