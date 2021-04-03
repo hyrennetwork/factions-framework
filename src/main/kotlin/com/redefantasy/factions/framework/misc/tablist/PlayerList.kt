@@ -62,9 +62,13 @@ class PlayerList(
     ) {
         val packet = PacketPlayOutPlayerInfo()
 
+        val _name = this.getNameFromIndex(index) + name
+
         val gameProfile = (Bukkit.getPlayerExact(name) as CraftPlayer?)?.handle?.profile ?: GameProfile(
             uuid,
-            this.getNameFromIndex(index) + name,
+            if (_name.length > 16) {
+                _name.substring(16, _name.length)
+            } else _name,
         )
 
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
@@ -72,7 +76,7 @@ class PlayerList(
             0,
             WorldSettings.EnumGamemode.NOT_SET,
             CraftChatMessage.fromString(
-                this.getNameFromIndex(index) + name
+                _name
             )[0]
         )
 
