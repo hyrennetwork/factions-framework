@@ -77,16 +77,18 @@ class UserPunishedEchoPacketListener : EchoListener {
                 )
 
                 println(
-                    arrayOf(
-                        "Balanço antigo: $oldBalance",
-                        "Balanço corrigido: ${
-                            if ((oldBalance - newBalance) <= 0.0) {
-                                0.0
-                            } else {
-                                newBalance
-                            }
-                        }"
-                    ).contentToString()
+                    "$name -> ${
+                        arrayOf(
+                            "Balanço antigo: $oldBalance",
+                            "Balanço corrigido: ${
+                                if ((oldBalance - newBalance) <= 0.0) {
+                                    0.0
+                                } else {
+                                    newBalance
+                                }
+                            }"
+                        ).contentToString()
+                    }"
                 )
             }
         }
