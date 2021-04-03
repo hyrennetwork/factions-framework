@@ -71,7 +71,7 @@ class UserPunishedEchoPacketListener : EchoListener {
 
                         balance
                     } else {
-                        val balance = 25.0 * balance / 100.0
+                        val balance = balance - (25.0 * balance / 100.0)
 
                         println("Balanço corrigido: $balance")
 
