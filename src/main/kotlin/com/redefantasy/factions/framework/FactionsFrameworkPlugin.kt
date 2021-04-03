@@ -32,6 +32,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     playerList.init()
 
                     Thread {
+                        Thread.sleep(100)
+
                         playerList.update(0, "§e§lMINHA FACÇÃO")
                         playerList.update(1, "§e[STF] STAFF")
                         playerList.update(2, "§0")
