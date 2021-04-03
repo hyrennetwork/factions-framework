@@ -44,10 +44,6 @@ class PlayerList(
 
     }
 
-    init {
-        for (i in 0 until size) this.update(i, "")
-    }
-
     fun update(
         index: Int,
         text: String
@@ -81,7 +77,7 @@ class PlayerList(
         packet.channels.add(CHANNEL_NAME)
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
-        packet.b = PLAYERS.subList(-1, 79)
+        packet.b = PLAYERS.subList(1, 80)
 
         player.sendPacket(packet)
     }
