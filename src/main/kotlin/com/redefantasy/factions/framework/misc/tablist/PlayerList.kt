@@ -2,6 +2,7 @@ package com.redefantasy.factions.framework.misc.tablist
 
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.shared.misc.utils.ChatColor
+import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
@@ -38,6 +39,8 @@ class PlayerList(
         )
     }
 
+    private val SEQUENCE_PREFIX = SequencePrefix()
+
     companion object {
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
@@ -64,9 +67,15 @@ class PlayerList(
 
         val _name = this.getNameFromIndex(index) + name
 
+        for (i in 0 until index - 1) {
+            SEQUENCE_PREFIX.next()
+        }
+
+        val prefix = SEQUENCE_PREFIX.next()
+
         val gameProfile = (Bukkit.getPlayerExact(name) as CraftPlayer?)?.handle?.profile ?: GameProfile(
             uuid,
-            index.toString(),
+            prefix
         )
 
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
