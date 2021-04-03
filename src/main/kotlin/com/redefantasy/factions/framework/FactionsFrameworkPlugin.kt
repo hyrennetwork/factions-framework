@@ -1,7 +1,5 @@
 package com.redefantasy.factions.framework
 
-import com.massivecraft.factions.entity.Faction
-import com.massivecraft.factions.entity.MPlayer
 import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
@@ -34,18 +32,16 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
          */
 
         try {
-            Class.forName("com.massivecraft.massivecore.MassiveCore")
-            Class.forName("com.massivecraft.factions.Factions")
+            FACTIONS_API = object : IFactionsAPI<
+                    com.massivecraft.factions.entity.Faction,
+                    com.massivecraft.factions.entity.MPlayer
+            > {
 
-            FACTIONS_API = object : IFactionsAPI<Faction, MPlayer> {
+                override fun com.massivecraft.factions.entity.Faction.getMembersFromFaction(): List<com.massivecraft.factions.entity.MPlayer> = this.mPlayers
 
-                override fun Faction.getMembersFromFaction(): List<MPlayer> {
-                    return this.mPlayers
-                }
+                override fun com.massivecraft.factions.entity.MPlayer.getFaction(): com.massivecraft.factions.entity.Faction? = this.faction
 
-                override fun MPlayer.getFaction(): Faction? = this.faction
-
-                override fun getMPlayer(uuid: UUID?) = MPlayer.get(uuid)
+                override fun getMPlayer(uuid: UUID?) = com.massivecraft.factions.entity.MPlayer.get(uuid)
 
             }
         } catch (ignored: Exception) { /* ignored */ }

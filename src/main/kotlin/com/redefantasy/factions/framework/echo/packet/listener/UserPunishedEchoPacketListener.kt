@@ -25,19 +25,19 @@ class UserPunishedEchoPacketListener : EchoListener {
 
             val faction = method.invoke(mPlayer) ?: return
 
-            val field = faction::class.java.getField("id")
-
-            field.isAccessible = true
-
-            val factionId = field.get(faction) ?: return
-
-            if (FactionsFrameworkConstants.IGNORED_FACTION_IDS.contains(factionId)) return
-
-            val _method = faction::class.java.getDeclaredMethod("getMPlayers")
+            val _method = faction::class.java.getDeclaredMethod("getId()")
 
             _method.isAccessible = true
 
-            val mPlayers = _method.invoke(faction) as List<Any?>
+            val factionId = _method.invoke(faction) ?: return
+
+            if (FactionsFrameworkConstants.IGNORED_FACTION_IDS.contains(factionId)) return
+
+            val __method = faction::class.java.getDeclaredMethod("getMPlayers")
+
+            __method.isAccessible = true
+
+            val mPlayers = __method.invoke(faction) as List<Any?>
 
             mPlayers.forEach {
                 println("MPlayer -> $it")
