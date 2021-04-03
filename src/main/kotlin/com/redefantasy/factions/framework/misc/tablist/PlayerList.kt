@@ -24,6 +24,8 @@ class PlayerList(
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     )
 
+    private val SEQUENCE_PREFIX = SequencePrefix()
+
     private val PLAYERS = MutableList(size) {
         val prefix = "__${SEQUENCE_PREFIX.next()}"
 
@@ -41,8 +43,6 @@ class PlayerList(
             )[0]
         )
     }
-
-    private val SEQUENCE_PREFIX = SequencePrefix()
 
     companion object {
 
