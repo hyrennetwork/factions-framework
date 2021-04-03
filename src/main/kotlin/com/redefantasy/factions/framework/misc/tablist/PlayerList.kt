@@ -66,9 +66,7 @@ class PlayerList(
 
         val gameProfile = (Bukkit.getPlayerExact(name) as CraftPlayer?)?.handle?.profile ?: GameProfile(
             uuid,
-            if (_name.length > 16) {
-                _name.substring(16, _name.length)
-            } else _name,
+            index.toString(),
         )
 
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
