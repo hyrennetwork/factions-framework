@@ -1,56 +1,60 @@
 package com.redefantasy.factions.framework
 
+import com.massivecraft.factions.entity.Faction
+import com.massivecraft.factions.entity.MPlayer
+import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
-import com.redefantasy.factions.framework.misc.tablist.PlayerList
-import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
+import com.redefantasy.factions.framework.api.IFactionsAPI
+import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
+import java.util.*
 
 /**
  * @author Gutyerrez
  */
 class FactionsFrameworkPlugin : CustomPlugin(false) {
 
+    companion object {
+
+        @JvmStatic lateinit var instance: CustomPlugin
+
+        @JvmStatic lateinit var FACTIONS_API: IFactionsAPI<*, *>
+
+    }
+
+    init {
+        instance = this
+    }
+
     override fun onEnable() {
         super.onEnable()
 
-        val pluginManager = Bukkit.getServer().pluginManager
+        /**
+         * Instanciando o massive com a api interna
+         */
 
-        pluginManager.registerEvents(
-            object : Listener {
+        try {
+            Class.forName("com.massivecraft.massivecore.MassiveCore")
+            Class.forName("com.massivecraft.factions.Factions")
 
-                @EventHandler
-                fun on(
-                    event: PlayerJoinEvent
-                ) {
-                    val player = event.player
+            FACTIONS_API = object : IFactionsAPI<Faction, MPlayer> {
 
-                    val playerList = PlayerList(player)
-
-                    playerList.update(0, "§e§lMINHA FACÇÃO")
-                    playerList.update(1, "§e[STF] STAFF")
-                    playerList.update(2, "§0")
-                    playerList.update(3, "§a• §6[Master] #Gutyerrez")
-                    playerList.update(4, "§a• §6[Master] *ImRamon")
-                    playerList.update(5, "§7• [Master] +VICTORBBBBR")
-                    playerList.update(6, "§7• -Recruta")
-                    playerList.update(7, "§7• -Recruta")
-                    playerList.update(8, "§7• -Recruta")
-                    playerList.update(9, "§7• -Recruta")
-                    playerList.update(10, "§7• -Recruta")
-                    playerList.update(11, "§7• -Recruta")
-                    playerList.update(12, "§7• -Recruta")
-                    playerList.update(13, "§7• -Recruta")
-                    playerList.update(14, "§7• -Recruta")
-                    playerList.update(15, "§7• -Recruta")
-                    playerList.update(16, "§7• -Recruta")
+                override fun Faction.getMembersFromFaction(): List<MPlayer> {
+                    return this.mPlayers
                 }
 
-            },
-            this
-        )
+                override fun MPlayer.getFaction(): Faction? = this.faction
+
+                override fun getMPlayer(uuid: UUID?) = MPlayer.get(uuid)
+
+            }
+        } catch (ignored: Exception) { /* ignored */ }
+
+        /**
+         * ECHO
+         */
+
+        CoreProvider.Databases.Redis.ECHO.provide().registerListener(UserPunishedEchoPacketListener())
     }
 
     override fun onDisable() {
