@@ -6,7 +6,6 @@ import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
-import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
@@ -15,7 +14,7 @@ import java.util.*
 /**
  * @author Gutyerrez
  */
-class PlayerList(
+class PlayerList private constructor(
     private val player: Player,
     size: Int = 80
 ) {
@@ -34,12 +33,14 @@ class PlayerList(
                 "__${SEQUENCE_PREFIX.next()}"
             ),
             0,
-            WorldSettings.EnumGamemode.NOT_SET,
+            WorldSettings.EnumGamemode.SURVIVAL,
             CraftChatMessage.fromString(
                 this.generateHiddenString()
             )[0]
         )
     }
+
+    val PACKET: PacketPlayOutPlayerInfo = PacketPlayOutPlayerInfo()
 
     private fun generateHiddenString(size: Int = 4): String {
         val stringBuilder = StringBuilder()
@@ -57,20 +58,24 @@ class PlayerList(
 
     companion object {
 
+        private val PLAYER_LIST = mutableMapOf<UUID, PlayerList>()
+
         const val CHANNEL_NAME = "hyren_custom_tab_list"
+
+        fun getPlayerList(player: Player) = PLAYER_LIST[player.uniqueId] ?: PlayerList(player)
 
     }
 
     init {
-        this.clearPlayers()
+        PACKET.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
+
+        PLAYER_LIST[player.uniqueId] = this
     }
 
     fun update(
         index: Int,
         text: String
     ) {
-        val packet = PacketPlayOutPlayerInfo()
-
         val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
             GameProfile(
                 UUID.randomUUID(),
@@ -85,18 +90,11 @@ class PlayerList(
 
         PLAYERS[index] = playerInfoData
 
-        packet.channels.add(CHANNEL_NAME)
+        PACKET.channels.add(CHANNEL_NAME)
 
-        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
-        packet.b = PLAYERS
+        PACKET.b = PLAYERS
 
-        player.sendPacket(packet)
-    }
-
-    private fun clearPlayers() {
-        Bukkit.getOnlinePlayers().forEach {
-            this.removePlayer(it)
-        }
+        player.sendPacket(PACKET)
     }
 
     fun removePlayer(player: Player) {
