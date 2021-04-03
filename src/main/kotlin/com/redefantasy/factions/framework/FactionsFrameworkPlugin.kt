@@ -33,6 +33,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     playerList.update(0, "§e§lMINHA FACÇÃO")
                     playerList.update(1, "§e[STF] STAFF")
+                    playerList.update(2, "§1")
                     playerList.update(3, "§a• §6[Master] #Gutyerrez")
                     playerList.update(4, "§a• §6[Master] *ImRamon")
                     playerList.update(5, "§7• [Master] +VICTORBBBBR")
