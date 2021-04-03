@@ -48,9 +48,11 @@ class PlayerList private constructor(
         for (i in 0..size) {
             COLOR_CODES.shuffle()
 
-            stringBuilder.append(ChatColor.getByChar(
-                COLOR_CODES[i]
-            ))
+            stringBuilder.append(
+                ChatColor.getByChar(
+                    COLOR_CODES[i]
+                )
+            )
         }
 
         return stringBuilder.toString()
@@ -62,14 +64,15 @@ class PlayerList private constructor(
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
 
-        fun getPlayerList(player: Player) = PLAYER_LIST[player.uniqueId] ?: PlayerList(player)
+        fun getPlayerList(player: Player) = PLAYER_LIST.getOrDefault(
+            player.uniqueId,
+            PlayerList(player)
+        )
 
     }
 
     init {
         PACKET.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
-
-        PLAYER_LIST[player.uniqueId] = this
     }
 
     fun update(
