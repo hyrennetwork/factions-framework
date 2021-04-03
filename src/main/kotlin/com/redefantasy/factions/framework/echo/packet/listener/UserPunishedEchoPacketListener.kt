@@ -20,43 +20,22 @@ class UserPunishedEchoPacketListener : EchoListener {
         val mPlayer = FactionsFrameworkPlugin.FACTIONS_API.getMPlayer(userId)
 
         if (mPlayer !== null) {
-            val getName = mPlayer::class.java.superclass.getDeclaredMethod("getName")
-
-//            getName.isAccessible = true
-
-            val name = getName.invoke(mPlayer) as String
-
-            println("MPlayer: $name")
-
-            val getFaction = mPlayer::class.java.getDeclaredMethod("getFaction")
-
-//            getFaction.isAccessible = true
-
-            val faction = getFaction.invoke(mPlayer) ?: return
-
-            val getId = faction::class.java.superclass.superclass.getMethod("getId")
-
-//            getId.isAccessible = true
-
-            val factionId = getId.invoke(faction) ?: return
+            val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(mPlayer) as String
+            val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
+            val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) ?: return
 
             if (FactionsFrameworkConstants.IGNORED_FACTION_IDS.contains(factionId)) return
 
-            val getMPlayers = faction::class.java.getDeclaredMethod("getMPlayers")
+            val mPlayers = faction::class.java.getDeclaredMethod("getMPlayers").invoke(faction) as List<Any?>
 
-//            getMPlayers.isAccessible = true
-
-            val mPlayers = getMPlayers.invoke(faction) as List<Any?>
-
-            val economyClass = Class.forName("net.milkbowl.vault.economy.Economy")
-            val registeredServiceProvider = Bukkit.getServer().servicesManager.getRegistration(economyClass).provider
+            val registeredServiceProvider = Bukkit.getServer().servicesManager.getRegistration(
+                Class.forName("net.milkbowl.vault.economy.Economy")
+            ).provider
 
             val getBalance = registeredServiceProvider::class.java.getMethod("getBalance")
 
-            getBalance.isAccessible = true
-
             mPlayers.forEach {
-                val balance = getBalance.invoke(economyClass, name) as Double
+                val balance = getBalance.invoke(registeredServiceProvider, null, name) as Double
 
                 println("$name -> Balanço: $balance")
 
