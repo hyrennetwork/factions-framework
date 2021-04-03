@@ -32,10 +32,13 @@ class UserPunishedEchoPacketListener : EchoListener {
                 Class.forName("net.milkbowl.vault.economy.Economy")
             ).provider
 
-            val getBalance = registeredServiceProvider::class.java.getMethod("getBalance")
+            val getBalance = registeredServiceProvider::class.java.getDeclaredMethod(
+                "getBalance",
+                String::class.java
+            )
 
             mPlayers.forEach {
-                val balance = getBalance.invoke(registeredServiceProvider, null, name) as Double
+                val balance = getBalance.invoke(registeredServiceProvider, name) as Double
 
                 println("$name -> Balanço: $balance")
 
