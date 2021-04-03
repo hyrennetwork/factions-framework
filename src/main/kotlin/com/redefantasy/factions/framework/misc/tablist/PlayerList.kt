@@ -92,6 +92,8 @@ class PlayerList private constructor(
         packet.channels.add(CHANNEL_NAME)
 
         packet.b = PLAYERS
+
+        player.sendPacket(packet)
     }
 
     fun removePlayer(player: Player) {
