@@ -6,6 +6,7 @@ import com.redefantasy.factions.framework.FactionsFrameworkConstants
 import com.redefantasy.factions.framework.FactionsFrameworkPlugin
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
+import kotlin.properties.Delegates
 
 /**
  * @author Gutyerrez
@@ -22,8 +23,7 @@ class UserPunishedEchoPacketListener : EchoListener {
         if (mPlayer !== null) {
             val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
 
-            val factionId =
-                faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
+            val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
             val factionTag = faction::class.java.getMethod("getTag").invoke(faction) as String
             val factionName = faction::class.java.getMethod("getName").invoke(faction) as String
 
@@ -51,28 +51,42 @@ class UserPunishedEchoPacketListener : EchoListener {
              * Outdated
              */
             Bukkit.broadcastMessage(
-                    "\n" +
-                    "§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna." +
-                    "\n\n"
+                "\n" +
+                "§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna." +
+                "\n\n"
             )
 
             mPlayers.forEach {
                 val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
 
-                val balance = getBalance.invoke(registeredServiceProvider, name) as Double
+                var oldBalance = getBalance.invoke(registeredServiceProvider, name) as Double
+                var newBalance by Delegates.notNull<Double>()
 
                 withdrawPlayer.invoke(
                     registeredServiceProvider,
                     name,
-                    if ((balance - 25.0 * balance / 100.0) <= 0.0) {
-                        balance
+                    if ((oldBalance - 25.0 * oldBalance / 100.0) <= 0.0) {
+                        newBalance = oldBalance
+
+                        newBalance
                     } else {
-                        val balance = balance % (balance - (25.0 * balance / 100.0))
+                        newBalance = oldBalance % (oldBalance - (25.0 * oldBalance / 100.0))
 
-                        println("Balanço corrigido: $balance")
-
-                        balance
+                        newBalance
                     }
+                )
+
+                println(
+                    arrayOf(
+                        "Balanço antigo: $oldBalance",
+                        "Balanço corrigido: ${
+                            if ((oldBalance - newBalance) <= 0.0) {
+                                0.0
+                            } else {
+                                newBalance
+                            }
+                        }"
+                    )
                 )
             }
         }
