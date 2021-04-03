@@ -39,7 +39,7 @@ class PlayerList(
                 0,
                 WorldSettings.EnumGamemode.NOT_SET,
                 CraftChatMessage.fromString(
-                    "§0"
+                    "§1"
                 )[0]
             )
         )
