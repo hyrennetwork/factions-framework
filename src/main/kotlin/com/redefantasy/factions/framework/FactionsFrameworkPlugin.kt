@@ -26,6 +26,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(PlayerList.CHANNEL_NAME)) {
+                        event.isCancelled = true
+
                         try {
                             val playerList = PlayerList.getPlayerList(player)
 
