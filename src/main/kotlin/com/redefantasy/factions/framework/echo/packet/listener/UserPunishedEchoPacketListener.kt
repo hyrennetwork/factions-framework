@@ -64,13 +64,15 @@ class UserPunishedEchoPacketListener : EchoListener {
                 withdrawPlayer.invoke(
                     registeredServiceProvider,
                     name,
-                    if ((balance - 25.0 * balance / 100.0) <= 0) {
+                    if ((balance - 25.0 * balance / 100.0) <= 0.0) {
                         println("Novo balanço: $balance")
                         balance
                     } else {
                         val balance = 25.0 * balance / 100.0
 
                         println("Balanço corrigido: $balance")
+
+                        balance
                     }
                 )
             }
