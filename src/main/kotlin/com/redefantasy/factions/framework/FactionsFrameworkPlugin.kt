@@ -28,7 +28,7 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(PlayerList.CHANNEL_NAME)) {
                         event.isCancelled = true
 
-                        val playerList = PlayerList.getPlayerList(player)
+                        val playerList = PlayerList(player)
 
                         playerList.update(0, "§e§lMINHA FACÇÃO")
                         playerList.update(1, "§e[STF] STAFF")
