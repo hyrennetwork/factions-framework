@@ -14,13 +14,8 @@ import java.util.*
  */
 class PlayerList(
     private val player: Player,
-    private val size: Int = 80
+    size: Int = 80
 ) {
-
-    private val COLOR_DECODER = arrayOf(
-        '0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-    )
 
     private val SEQUENCE_PREFIX = SequencePrefix()
 
@@ -42,10 +37,6 @@ class PlayerList(
 
         const val CHANNEL_NAME = "hyren_custom_tab_list"
 
-    }
-
-    init {
-        this.remove(player)
     }
 
     fun update(
@@ -74,26 +65,6 @@ class PlayerList(
         packet.b = PLAYERS
 
         player.sendPacket(packet)
-    }
-
-    private fun remove(player: Player) {
-//        val packet = PacketPlayOutPlayerInfo()
-//
-//        val gameProfile = (player as CraftPlayer).handle.profile
-//
-//        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
-//            gameProfile,
-//            0,
-//            WorldSettings.EnumGamemode.NOT_SET,
-//            null
-//        )
-//
-//        packet.channels.add(CHANNEL_NAME)
-//
-//        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
-//        packet.b.add(playerInfoData)
-//
-//        Bukkit.getOnlinePlayers().forEach { it.sendPacket(packet) }
     }
 
 }
