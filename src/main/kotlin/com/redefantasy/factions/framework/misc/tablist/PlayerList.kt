@@ -3,7 +3,6 @@ package com.redefantasy.factions.framework.misc.tablist
 import com.mojang.authlib.GameProfile
 import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
-import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
 import org.bukkit.Bukkit
@@ -28,14 +27,10 @@ class PlayerList(
     private val SEQUENCE_PREFIX = SequencePrefix()
 
     private val PLAYERS = MutableList(size) {
-        val prefix = "__${SEQUENCE_PREFIX.next()}"
-
-        println("Slot $it --> $prefix")
-
         PacketPlayOutPlayerInfo.PlayerInfoData(
             GameProfile(
                 UUID.randomUUID(),
-                prefix
+                SEQUENCE_PREFIX.next()
             ),
             0,
             WorldSettings.EnumGamemode.NOT_SET,
@@ -61,16 +56,19 @@ class PlayerList(
     ) {
         val packet = PacketPlayOutPlayerInfo()
 
-        val playerInfoData = PLAYERS[index]
-
-        val field = playerInfoData::class.java.getDeclaredField("e")
-
-        field.isAccessible = true
-
-        field.set(
-            playerInfoData,
-            ChatComponentText(text)
+        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
+            GameProfile(
+                UUID.randomUUID(),
+                SEQUENCE_PREFIX.next()
+            ),
+            0,
+            WorldSettings.EnumGamemode.NOT_SET,
+            CraftChatMessage.fromString(
+                text
+            )[0]
         )
+
+        PLAYERS[index] = playerInfoData
 
         packet.channels.add(CHANNEL_NAME)
 
