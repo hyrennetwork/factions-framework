@@ -25,7 +25,7 @@ class UserPunishedEchoPacketListener : EchoListener {
 
             val faction = method.invoke(mPlayer) ?: return
 
-            val _method = faction::class.java.getDeclaredMethod("getId")
+            val _method = faction::class.java.superclass.superclass.getMethod("getId")
 
             _method.isAccessible = true
 
