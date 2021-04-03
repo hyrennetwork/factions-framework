@@ -26,6 +26,8 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     val packet = event.packet
 
                     if (packet is PacketPlayOutPlayerInfo && !packet.channels.contains(PlayerList.CHANNEL_NAME)) {
+                        event.isCancelled = true
+
                         val playerList = PlayerList.getPlayerList(player)
 
                         playerList.update(0, "§e§lMINHA FACÇÃO")
@@ -37,8 +39,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                         for (i in 6 until 16)
                             playerList.update(i, "§7• -${RandomStringUtils.randomAlphabetic(8)}")
-
-                        event.packet = packet
                     }
                 }
 
