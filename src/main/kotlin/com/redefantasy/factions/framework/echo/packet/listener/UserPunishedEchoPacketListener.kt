@@ -86,7 +86,7 @@ class UserPunishedEchoPacketListener : EchoListener {
                                 newBalance
                             }
                         }"
-                    )
+                    ).contentToString()
                 )
             }
         }
