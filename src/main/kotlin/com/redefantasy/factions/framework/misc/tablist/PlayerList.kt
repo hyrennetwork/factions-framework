@@ -21,7 +21,19 @@ class PlayerList(
 
     private val SEQUENCE_PREFIX = SequencePrefix()
 
-    private val PLAYERS = mutableListOf<PacketPlayOutPlayerInfo.PlayerInfoData>()
+    private val PLAYERS = MutableList(80) {
+        PacketPlayOutPlayerInfo.PlayerInfoData(
+            GameProfile(
+                UUID.randomUUID(),
+                "__${SEQUENCE_PREFIX.next()}"
+            ),
+            0,
+            WorldSettings.EnumGamemode.NOT_SET,
+            CraftChatMessage.fromString(
+                "§0"
+            )[0]
+        )
+    }
 
     companion object {
 
@@ -30,19 +42,8 @@ class PlayerList(
     }
 
     fun init() {
-        for (i in 0 until size) this.PLAYERS.add(
-            PacketPlayOutPlayerInfo.PlayerInfoData(
-                GameProfile(
-                    UUID.randomUUID(),
-                    "__${SEQUENCE_PREFIX.next()}"
-                ),
-                0,
-                WorldSettings.EnumGamemode.NOT_SET,
-                CraftChatMessage.fromString(
-                    "§0"
-                )[0]
-            )
-        )
+        for (i in 0 until size)
+            this.update(i, "§1")
     }
 
     fun update(
