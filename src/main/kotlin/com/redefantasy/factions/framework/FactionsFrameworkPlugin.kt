@@ -48,6 +48,10 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     playerList.update(14, "§7• -Recruta")
                     playerList.update(15, "§7• -Recruta")
                     playerList.update(16, "§7• -Recruta")
+
+                    for (i in 17 until 80) {
+                        playerList.update(i, "§2")
+                    }
                 }
 
             },
