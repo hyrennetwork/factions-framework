@@ -37,11 +37,6 @@ class PlayerList(
 
     }
 
-    fun init() {
-        for (i in 0 until size)
-            this.update(i, "§1§2")
-    }
-
     fun update(
         index: Int,
         text: String

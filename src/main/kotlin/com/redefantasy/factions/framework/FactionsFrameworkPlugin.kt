@@ -46,8 +46,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
                     playerList.update(14, "§7• -Recruta")
                     playerList.update(15, "§7• -Recruta")
                     playerList.update(16, "§7• -Recruta")
-
-                    playerList.init()
                 }
 
             },
