@@ -5,8 +5,6 @@ import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
-import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
 import java.util.*
@@ -79,23 +77,23 @@ class PlayerList(
     }
 
     private fun remove(player: Player) {
-        val packet = PacketPlayOutPlayerInfo()
-
-        val gameProfile = (player as CraftPlayer).handle.profile
-
-        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
-            gameProfile,
-            0,
-            WorldSettings.EnumGamemode.NOT_SET,
-            null
-        )
-
-        packet.channels.add(CHANNEL_NAME)
-
-        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
-        packet.b.add(playerInfoData)
-
-        Bukkit.getOnlinePlayers().forEach { it.sendPacket(packet) }
+//        val packet = PacketPlayOutPlayerInfo()
+//
+//        val gameProfile = (player as CraftPlayer).handle.profile
+//
+//        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
+//            gameProfile,
+//            0,
+//            WorldSettings.EnumGamemode.NOT_SET,
+//            null
+//        )
+//
+//        packet.channels.add(CHANNEL_NAME)
+//
+//        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
+//        packet.b.add(playerInfoData)
+//
+//        Bukkit.getOnlinePlayers().forEach { it.sendPacket(packet) }
     }
 
 }
