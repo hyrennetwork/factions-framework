@@ -2,7 +2,10 @@ package com.redefantasy.factions.framework
 
 import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
+import com.redefantasy.core.spigot.misc.utils.PacketEvent
+import com.redefantasy.core.spigot.misc.utils.PacketListener
 import com.redefantasy.factions.framework.misc.tablist.PlayerList
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import org.apache.commons.lang3.RandomStringUtils
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -47,6 +50,30 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
             this
         )
 
+        CoreSpigotConstants.PROTOCOL_HANDLER.registerListener(
+            object : PacketListener() {
+
+                override fun onSent(
+                    event: PacketEvent
+                ) {
+                    val packet = event.packet
+
+                    if (packet is PacketPlayOutPlayerInfo) {
+                        when (packet.a) {
+                            PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER -> {
+                                val _packet = PacketPlayOutPlayerInfo()
+
+                                _packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
+                                _packet.b = packet.b
+
+                                event.packet = _packet
+                            }
+                        }
+                    }
+                }
+
+            }
+        )
     }
 
     override fun onDisable() {
