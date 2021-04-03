@@ -81,7 +81,7 @@ class PlayerList(
         packet.channels.add(CHANNEL_NAME)
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
-        packet.b = PLAYERS
+        packet.b = PLAYERS.subList(0, 1)
 
         player.sendPacket(packet)
     }
