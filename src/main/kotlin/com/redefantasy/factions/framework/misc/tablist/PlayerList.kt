@@ -5,6 +5,7 @@ import com.redefantasy.core.shared.misc.utils.SequencePrefix
 import com.redefantasy.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
 import java.util.*
@@ -39,6 +40,10 @@ class PlayerList(
 
     }
 
+    init {
+        this.removePlayer(player)
+    }
+
     fun update(
         index: Int,
         text: String
@@ -63,6 +68,25 @@ class PlayerList(
 
         packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER
         packet.b = PLAYERS
+
+        player.sendPacket(packet)
+    }
+
+    fun removePlayer(player: Player) {
+        val packet = PacketPlayOutPlayerInfo()
+
+        val gameProfile = (player as CraftPlayer).handle.profile
+
+        val playerInfoData = PacketPlayOutPlayerInfo.PlayerInfoData(
+            gameProfile,
+            0,
+            WorldSettings.EnumGamemode.NOT_SET,
+            null
+        )
+
+        packet.a = PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER
+
+        packet.b.add(playerInfoData)
 
         player.sendPacket(packet)
     }
