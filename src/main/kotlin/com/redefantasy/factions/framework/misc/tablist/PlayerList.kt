@@ -41,10 +41,6 @@ class PlayerList(
 
     }
 
-    init {
-        this.remove(player)
-    }
-
     fun update(
         index: Int,
         text: String
