@@ -32,8 +32,22 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     val playerList = PlayerList(player)
 
-                    playerList.update(0, "Testando")
-                    playerList.update(10, "Dale")
+                    playerList.update(0, "§e§lMINHA FACÇÃO")
+                    playerList.update(1, "§e[STF] STAFF")
+                    playerList.update(3, "§a• §6[Master] #Gutyerrez")
+                    playerList.update(4, "§a• §6[Master] *ImRamon")
+                    playerList.update(5, "§7• [Master] +VICTORBBBBR")
+                    playerList.update(6, "§7• -Recruta")
+                    playerList.update(7, "§7• -Recruta")
+                    playerList.update(8, "§7• -Recruta")
+                    playerList.update(9, "§7• -Recruta")
+                    playerList.update(10, "§7• -Recruta")
+                    playerList.update(11, "§7• -Recruta")
+                    playerList.update(12, "§7• -Recruta")
+                    playerList.update(13, "§7• -Recruta")
+                    playerList.update(14, "§7• -Recruta")
+                    playerList.update(15, "§7• -Recruta")
+                    playerList.update(16, "§7• -Recruta")
                 }
 
             },
