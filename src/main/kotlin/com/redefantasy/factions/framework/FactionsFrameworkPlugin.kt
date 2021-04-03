@@ -51,8 +51,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
                     if (packet is PacketPlayOutPlayerInfo) {
                         event.cancelled = !packet.channels.contains(PlayerList.CHANNEL_NAME)
-
-                        println(packet.channels.contains(PlayerList.CHANNEL_NAME))
                     }
                 }
 
