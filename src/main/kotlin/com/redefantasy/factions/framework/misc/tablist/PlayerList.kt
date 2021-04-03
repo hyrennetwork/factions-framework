@@ -40,7 +40,7 @@ class PlayerList private constructor(
         )
     }
 
-    var PACKET: PacketPlayOutPlayerInfo = PacketPlayOutPlayerInfo()
+    lateinit var PACKET: PacketPlayOutPlayerInfo
 
     private fun generateHiddenString(size: Int = 4): String {
         val stringBuilder = StringBuilder()
@@ -75,6 +75,10 @@ class PlayerList private constructor(
             return playerList
         }
 
+    }
+
+    init {
+        PACKET = PacketPlayOutPlayerInfo()
     }
 
     fun update(
