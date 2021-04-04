@@ -2,8 +2,8 @@ plugins {
     kotlin("jvm") version "1.4.31"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("maven-publish")
-    id("java")
+    `maven-publish`
+    java
 }
 
 group = "com.redefantasy"
@@ -17,16 +17,6 @@ repositories {
     jcenter()
 }
 
-sourceSets {
-    main {
-        java {
-            setSrcDirs(
-                listOf("src/main/kotlin")
-            )
-        }
-    }
-}
-
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -38,7 +28,6 @@ tasks {
         val fileName = "${project.name}.jar"
 
         archiveFileName.set("${project.name}.jar")
-
 
         doLast {
             try {
@@ -54,12 +43,6 @@ tasks {
                 ex.printStackTrace()
             }
         }
-    }
-}
-
-sourceSets {
-    main {
-        java.srcDirs("main/kotlin")
     }
 }
 
