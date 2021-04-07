@@ -60,6 +60,8 @@ class UserPunishedEchoPacketListener : EchoListener {
                 "\n\n"
             )
 
+            var total = 0.0
+
             mPlayers.forEach {
                 val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
 
@@ -94,7 +96,15 @@ class UserPunishedEchoPacketListener : EchoListener {
                         ).contentToString()
                     }"
                 )
+
+                total += if ((oldBalance - newBalance) <= 0.0) {
+                    0.0
+                } else {
+                    newBalance
+                }
             }
+
+            println("Total perdido: $total")
         }
     }
 
