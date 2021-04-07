@@ -1,7 +1,9 @@
 package com.redefantasy.factions.framework.echo.packet.listener
 
+import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.shared.echo.api.listener.EchoListener
 import com.redefantasy.core.shared.echo.packets.UserPunishedPacket
+import com.redefantasy.core.shared.misc.punish.PunishType
 import com.redefantasy.factions.framework.FactionsFrameworkConstants
 import com.redefantasy.factions.framework.FactionsFrameworkPlugin
 import org.bukkit.Bukkit
@@ -20,7 +22,9 @@ class UserPunishedEchoPacketListener : EchoListener {
         val userId = packet.userId
         val mPlayer = FactionsFrameworkPlugin.FACTIONS_API.getMPlayer(userId)
 
-        if (mPlayer !== null) {
+        val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
+
+        if (mPlayer !== null && punishment.punishType != PunishType.MUTE) {
             val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
 
             val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
