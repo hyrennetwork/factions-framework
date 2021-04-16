@@ -4,7 +4,6 @@ import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.shared.applications.status.ApplicationStatus
 import com.redefantasy.core.shared.applications.status.task.ApplicationStatusTask
 import com.redefantasy.core.shared.scheduler.AsyncScheduler
-import com.redefantasy.core.spigot.CoreSpigotConstants
 import com.redefantasy.core.spigot.command.registry.CommandRegistry
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
@@ -97,12 +96,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
             1,
             TimeUnit.SECONDS
         )
-    }
-
-    override fun onDisable() {
-        super.onDisable()
-
-        CoreSpigotConstants.PROTOCOL_HANDLER.close()
     }
 
 }
