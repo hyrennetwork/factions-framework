@@ -5,7 +5,9 @@ import com.redefantasy.core.shared.applications.status.ApplicationStatus
 import com.redefantasy.core.shared.applications.status.task.ApplicationStatusTask
 import com.redefantasy.core.shared.scheduler.AsyncScheduler
 import com.redefantasy.core.spigot.CoreSpigotConstants
+import com.redefantasy.core.spigot.command.registry.CommandRegistry
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
+import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
 import com.redefantasy.factions.framework.api.IFactionsAPI
 import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
@@ -33,6 +35,12 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
 
     override fun onEnable() {
         super.onEnable()
+
+        /**
+         * Commands
+         */
+
+        CommandRegistry.registerCommand(SkinCommand())
 
         /**
          * Instanciando o massive com a api interna
