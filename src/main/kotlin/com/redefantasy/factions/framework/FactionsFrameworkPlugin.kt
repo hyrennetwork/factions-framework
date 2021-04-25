@@ -1,6 +1,7 @@
 package com.redefantasy.factions.framework
 
 import com.redefantasy.core.shared.CoreProvider
+import com.redefantasy.core.shared.applications.ApplicationType
 import com.redefantasy.core.shared.applications.status.ApplicationStatus
 import com.redefantasy.core.shared.applications.status.task.ApplicationStatusTask
 import com.redefantasy.core.shared.scheduler.AsyncScheduler
@@ -8,6 +9,7 @@ import com.redefantasy.core.spigot.command.registry.CommandRegistry
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
 import com.redefantasy.factions.framework.api.IFactionsAPI
+import com.redefantasy.factions.framework.commands.staff.SerializeItemCommand
 import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
 import java.util.*
@@ -40,6 +42,10 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
          */
 
         CommandRegistry.registerCommand(SkinCommand())
+
+        if (CoreProvider.application.applicationType == ApplicationType.SERVER_TESTS) {
+            CommandRegistry.registerCommand(SerializeItemCommand())
+        }
 
         /**
          * Instanciando o massive com a api interna

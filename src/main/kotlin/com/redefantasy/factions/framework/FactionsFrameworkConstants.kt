@@ -1,5 +1,10 @@
 package com.redefantasy.factions.framework
 
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.redefantasy.core.shared.CoreConstants
+import com.redefantasy.core.spigot.misc.jackson.ItemStackSerializer
+import org.bukkit.inventory.ItemStack
+
 /**
  * @author Gutyerrez
  */
@@ -10,5 +15,13 @@ object FactionsFrameworkConstants {
         "safezone",
         "warzone"
     )
+
+    init {
+        CoreConstants.JACKSON.registerModule(SimpleModule().apply {
+            this.addSerializer(
+                ItemStack::class.java, ItemStackSerializer()
+            )
+        })
+    }
 
 }
