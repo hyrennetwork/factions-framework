@@ -1,21 +1,17 @@
 package com.redefantasy.factions.framework
 
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.redefantasy.core.shared.CoreConstants
 import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.shared.applications.ApplicationType
 import com.redefantasy.core.shared.applications.status.ApplicationStatus
 import com.redefantasy.core.shared.applications.status.task.ApplicationStatusTask
 import com.redefantasy.core.shared.scheduler.AsyncScheduler
 import com.redefantasy.core.spigot.command.registry.CommandRegistry
-import com.redefantasy.core.spigot.misc.jackson.ItemStackSerializer
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
 import com.redefantasy.factions.framework.api.IFactionsAPI
 import com.redefantasy.factions.framework.commands.staff.SerializeItemCommand
 import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
-import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -75,19 +71,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
          */
 
         CoreProvider.Databases.Redis.ECHO.provide().registerListener(UserPunishedEchoPacketListener())
-
-        /**
-         * Misc
-         */
-
-        val module = SimpleModule()
-
-        module.addSerializer(
-            ItemStack::class.java,
-            ItemStackSerializer()
-        )
-
-        CoreConstants.JACKSON.registerModule(module)
 
         /**
          * Application status
