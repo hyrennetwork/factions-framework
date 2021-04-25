@@ -10,18 +10,21 @@ import org.bukkit.inventory.ItemStack
  */
 object FactionsFrameworkConstants {
 
-    val IGNORED_FACTION_IDS = arrayOf(
-        "none",
-        "safezone",
-        "warzone"
-    )
+	val IGNORED_FACTION_IDS = arrayOf(
+		"none",
+		"safezone",
+		"warzone"
+	)
 
-    init {
-        CoreConstants.JACKSON.registerModule(SimpleModule().apply {
-            this.addSerializer(
-                ItemStack::class.java, ItemStackSerializer()
-            )
-        })
-    }
+	init {
+		val module = SimpleModule()
+
+		module.addSerializer(
+			ItemStack::class.java,
+			ItemStackSerializer()
+		)
+
+		CoreConstants.JACKSON.registerModule(module)
+	}
 
 }
