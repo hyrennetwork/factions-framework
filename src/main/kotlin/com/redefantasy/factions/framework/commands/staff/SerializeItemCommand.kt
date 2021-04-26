@@ -6,6 +6,8 @@ import com.redefantasy.core.shared.groups.Group
 import com.redefantasy.core.shared.users.data.User
 import com.redefantasy.core.spigot.command.CustomCommand
 import com.redefantasy.core.spigot.misc.utils.ItemBuilder
+import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -37,14 +39,25 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 
 		val serializedItemStack = CoreConstants.JACKSON.writeValueAsString(itemStack)
 
+		println(serializedItemStack)
+
+		commandSender.sendMessage(
+			ComponentBuilder("§7Clique aqui para copiar o item serializado.")
+				.event(
+					ClickEvent(
+						ClickEvent.Action.COPY_TO_CLIPBOARD,
+						serializedItemStack
+					)
+				)
+				.create()
+		)
+
 		val deserializedItemStack = CoreConstants.JACKSON.readValue(
 			serializedItemStack,
 			ItemStack::class.java
 		)
 
-		commandSender.itemInHand = deserializedItemStack
-
-		commandSender.updateInventory();
+		commandSender.inventory.addItem(deserializedItemStack)
 		return false
 	}
 
