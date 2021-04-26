@@ -37,16 +37,12 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 
 		val serializedItemStack = CoreConstants.JACKSON.writeValueAsString(itemStack)
 
-		println(serializedItemStack)
-
 		val deserializedItemStack = CoreConstants.JACKSON.readValue(
 			serializedItemStack,
 			ItemStack::class.java
 		)
 
 		val _serializedItemStack = CoreConstants.JACKSON.writeValueAsString(deserializedItemStack)
-
-		println(_serializedItemStack)
 
 		commandSender.itemInHand = deserializedItemStack
 		return false
