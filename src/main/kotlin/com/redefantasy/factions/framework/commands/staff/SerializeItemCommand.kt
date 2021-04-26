@@ -43,6 +43,8 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 		)
 
 		commandSender.itemInHand = deserializedItemStack
+
+		commandSender.updateInventory();
 		return false
 	}
 
