@@ -24,13 +24,15 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 		commandSender as Player
 
 		val itemStack = ItemBuilder(Material.DIAMOND_SWORD).name(
-				"§bItem teste"
+				"§bItem test"
 			).amount(
-			2
+			1
 			).lore(
 				arrayOf(
 					"§7hm"
 				)
+			).NBT(
+				"test", 1
 			).build()
 
 		val serializedItemStack = CoreConstants.JACKSON.writeValueAsString(itemStack)
