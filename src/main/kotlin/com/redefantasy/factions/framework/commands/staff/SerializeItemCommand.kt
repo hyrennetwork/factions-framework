@@ -42,8 +42,6 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 			ItemStack::class.java
 		)
 
-		val _serializedItemStack = CoreConstants.JACKSON.writeValueAsString(deserializedItemStack)
-
 		commandSender.itemInHand = deserializedItemStack
 		return false
 	}
