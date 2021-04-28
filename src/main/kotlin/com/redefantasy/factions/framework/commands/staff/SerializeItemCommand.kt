@@ -1,6 +1,7 @@
 package com.redefantasy.factions.framework.commands.staff
 
 import com.redefantasy.core.shared.CoreConstants
+import com.redefantasy.core.shared.commands.restriction.CommandRestriction
 import com.redefantasy.core.shared.commands.restriction.entities.implementations.GroupCommandRestrictable
 import com.redefantasy.core.shared.groups.Group
 import com.redefantasy.core.shared.users.data.User
@@ -18,6 +19,29 @@ import org.bukkit.inventory.ItemStack
  * @author Gutyerrez
  */
 class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictable {
+
+	override fun getCommandRestriction() = CommandRestriction.GAME
+
+	override fun getSubCommands(): List<CustomCommand> = listOf(
+		object : CustomCommand("modo") {
+
+			override fun onCommand(
+				commandSender: CommandSender,
+				user: User?,
+				args: Array<out String>
+			): Boolean {
+				commandSender as Player
+
+				commandSender.gameMode = if (commandSender.gameMode == GameMode.CREATIVE) {
+					GameMode.SURVIVAL
+				} else GameMode.CREATIVE
+
+				commandSender.sendMessage("Pronto!")
+				return true
+			}
+
+		}
+	)
 
 	override fun onCommand(
 		commandSender: CommandSender,
