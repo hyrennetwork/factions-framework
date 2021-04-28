@@ -1,6 +1,7 @@
 package com.redefantasy.factions.framework.commands.staff
 
 import com.redefantasy.core.shared.CoreConstants
+import com.redefantasy.core.shared.commands.argument.Argument
 import com.redefantasy.core.shared.commands.restriction.CommandRestriction
 import com.redefantasy.core.shared.commands.restriction.entities.implementations.GroupCommandRestrictable
 import com.redefantasy.core.shared.groups.Group
@@ -9,11 +10,14 @@ import com.redefantasy.core.spigot.command.CustomCommand
 import com.redefantasy.core.spigot.misc.utils.ItemBuilder
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 /**
  * @author Gutyerrez
@@ -37,6 +41,28 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 				} else GameMode.CREATIVE
 
 				commandSender.sendMessage("Pronto!")
+				return true
+			}
+
+		},
+		object : CustomCommand("haste") {
+
+			override fun getArguments() = listOf(
+				Argument("usuário")
+			)
+
+			override fun onCommand(
+				commandSender: CommandSender,
+				user: User?,
+				args: Array<out String>
+			): Boolean {
+				val player = Bukkit.getPlayerExact(args[0])
+
+				player.addPotionEffect(PotionEffect(
+					PotionEffectType.FAST_DIGGING,
+					Int.MAX_VALUE,
+					1
+				))
 				return true
 			}
 
