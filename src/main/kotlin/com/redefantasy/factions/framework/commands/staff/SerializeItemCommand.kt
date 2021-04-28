@@ -8,6 +8,7 @@ import com.redefantasy.core.spigot.command.CustomCommand
 import com.redefantasy.core.spigot.misc.utils.ItemBuilder
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -25,7 +26,7 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 	): Boolean {
 		commandSender as Player
 
-		val itemStack = ItemBuilder(Material.DIAMOND_SWORD).name(
+		val itemStack = ItemBuilder(Material.DIAMOND_PICKAXE).name(
 				"§bItem test"
 			).amount(
 			1
@@ -58,6 +59,8 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 		)
 
 		commandSender.inventory.addItem(deserializedItemStack)
+
+		commandSender.gameMode = GameMode.CREATIVE
 		return false
 	}
 
