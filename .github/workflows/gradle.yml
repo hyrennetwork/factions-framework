@@ -1,3 +1,5 @@
+name: Factions-Framework
+
 on: [ 'push' ]
 
 jobs:
