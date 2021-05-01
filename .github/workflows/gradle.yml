@@ -1,9 +1,7 @@
-name: Factions-Framework
-
 on: [ 'push' ]
 
 jobs:
-  build:
+  factions-frameowrk:
     runs-on: self-hosted
 
     steps:
