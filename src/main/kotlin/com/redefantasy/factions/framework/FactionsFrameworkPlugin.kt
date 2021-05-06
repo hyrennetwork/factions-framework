@@ -8,11 +8,9 @@ import com.redefantasy.core.shared.scheduler.AsyncScheduler
 import com.redefantasy.core.spigot.command.registry.CommandRegistry
 import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
 import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
-import com.redefantasy.factions.framework.api.IFactionsAPI
 import com.redefantasy.factions.framework.commands.staff.SerializeItemCommand
 import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -23,8 +21,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
     companion object {
 
         @JvmStatic lateinit var instance: CustomPlugin
-
-        @JvmStatic lateinit var FACTIONS_API: IFactionsAPI<*, *>
 
     }
 
@@ -46,25 +42,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
         if (CoreProvider.application.applicationType == ApplicationType.SERVER_TESTS) {
             CommandRegistry.registerCommand(SerializeItemCommand())
         }
-
-        /**
-         * Instanciando o massive com a api interna
-         */
-
-        try {
-            FACTIONS_API = object : IFactionsAPI<
-                    com.massivecraft.factions.entity.Faction,
-                    com.massivecraft.factions.entity.MPlayer
-            > {
-
-                override fun com.massivecraft.factions.entity.Faction.getMembersFromFaction(): List<com.massivecraft.factions.entity.MPlayer> = this.mPlayers
-
-                override fun com.massivecraft.factions.entity.MPlayer.getFaction(): com.massivecraft.factions.entity.Faction? = this.faction
-
-                override fun getMPlayer(uuid: UUID?) = com.massivecraft.factions.entity.MPlayer.get(uuid)
-
-            }
-        } catch (ignored: Exception) { /* ignored */ }
 
         /**
          * ECHO

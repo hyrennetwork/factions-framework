@@ -4,7 +4,6 @@ import com.redefantasy.core.shared.CoreProvider
 import com.redefantasy.core.shared.echo.api.listener.EchoListener
 import com.redefantasy.core.shared.echo.packets.UserPunishedPacket
 import com.redefantasy.factions.framework.FactionsFrameworkConstants
-import com.redefantasy.factions.framework.FactionsFrameworkPlugin
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
 import kotlin.properties.Delegates
@@ -19,12 +18,15 @@ class UserPunishedEchoPacketListener : EchoListener {
         packet: UserPunishedPacket
     ) {
         val userId = packet.userId
-        val mPlayer = FactionsFrameworkPlugin.FACTIONS_API.getMPlayer(userId)
+
+        val mPlayer = Class.forName("com.massivecraft.factions.entity.MPlayer")
+
+        val _mPlayer = mPlayer::class.java.getMethod("get").invoke(userId)
 
         val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 
         if (mPlayer !== null && punishment.punishCategory == CoreProvider.Cache.Local.PUNISH_CATEGORIES.provide().fetchByName("USO_DE_HACK ")) {
-            val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(mPlayer) ?: return
+            val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(_mPlayer) ?: return
 
             val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
             val factionTag = faction::class.java.getMethod("getTag").invoke(faction) as String
@@ -48,7 +50,7 @@ class UserPunishedEchoPacketListener : EchoListener {
                 Double::class.java
             )
 
-            val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(mPlayer) as String
+            val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
 
             /**
              * Outdated

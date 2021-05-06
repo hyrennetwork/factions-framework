@@ -58,9 +58,4 @@ dependencies {
     // core
     compileOnly("com.redefantasy:core-shared:0.1-ALPHA")
     compileOnly("com.redefantasy:core-spigot:0.1-ALPHA")
-
-    // factions
-    compileOnly("com.massivecraft:massivecore:2.13.6")
-    compileOnly("com.massivecraft:factions:2.13.6")
-    // factions
 }
