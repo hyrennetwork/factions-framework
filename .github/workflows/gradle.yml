@@ -1,7 +1,7 @@
 on: [ 'push' ]
 
 jobs:
-  lobby:
+  factions-framework:
     runs-on: ubuntu-latest
 
     env:
