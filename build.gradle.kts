@@ -2,8 +2,6 @@ plugins {
     kotlin("jvm") version "1.4.31"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    `maven-publish`
-    java
 }
 
 group = "com.redefantasy"
@@ -12,9 +10,14 @@ version = "0.1-ALPHA"
 repositories {
     mavenCentral()
 
-    mavenLocal()
-
     jcenter()
+
+    maven("https://maven.pkg.github.com/hyrendev/nexus/") {
+        credentials {
+            username = System.getenv("MAVEN_USERNAME")
+            password = System.getenv("MAVEN_PASSWORD")
+        }
+    }
 }
 
 tasks {
@@ -25,24 +28,7 @@ tasks {
     }
 
     shadowJar {
-        val fileName = "${project.name}.jar"
-
         archiveFileName.set("${project.name}.jar")
-
-        doLast {
-            try {
-                val file = file("build/libs/$fileName")
-
-                val toDelete = file("/home/cloud/output/$fileName")
-
-                if (toDelete.exists()) toDelete.delete()
-
-                file.copyTo(file("/home/cloud/output/$fileName"))
-                file.delete()
-            } catch (ex: java.io.FileNotFoundException) {
-                ex.printStackTrace()
-            }
-        }
     }
 }
 
@@ -52,9 +38,6 @@ dependencies {
 
     // paperspigot
     compileOnly("org.github.paperspigot:paperspigot:1.8.8-R0.1-SNAPSHOT")
-
-    // waterfall chat
-    compileOnly("io.github.waterfallmc:waterfall-chat:1.16-R0.5-SNAPSHOT")
 
     // exposed
     compileOnly("org.jetbrains.exposed:exposed-core:0.29.1")
@@ -80,21 +63,4 @@ dependencies {
     compileOnly("com.massivecraft:massivecore:2.13.6")
     compileOnly("com.massivecraft:factions:2.13.6")
     // factions
-}
-
-val sources by tasks.registering(Jar::class) {
-    archiveFileName.set(project.name)
-    archiveClassifier.set("sources")
-    archiveVersion.set(null as String?)
-
-    from(sourceSets.main.get().allSource)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
-            artifact(sources.get())
-        }
-    }
 }
