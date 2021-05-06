@@ -25,7 +25,7 @@ class UserPunishedEchoPacketListener : EchoListener {
 
         val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 
-        if (mPlayer !== null && punishment.punishCategory == CoreProvider.Cache.Local.PUNISH_CATEGORIES.provide().fetchByName("USO_DE_HACK ")) {
+        if (mPlayer !== null && punishment.punishCategory == CoreProvider.Cache.Local.PUNISH_CATEGORIES.provide().fetchByName("USO_DE_HACK")) {
             val faction = mPlayer::class.java.getDeclaredMethod("getFaction").invoke(_mPlayer) ?: return
 
             val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
