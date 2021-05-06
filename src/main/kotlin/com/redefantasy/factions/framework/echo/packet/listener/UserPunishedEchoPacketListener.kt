@@ -21,7 +21,7 @@ class UserPunishedEchoPacketListener : EchoListener {
 
         val mPlayer = Class.forName("com.massivecraft.factions.entity.MPlayer")
 
-        val _mPlayer = mPlayer::class.java.getMethod("get").invoke(userId)
+        val _mPlayer = mPlayer.getMethod("get").invoke(userId)
 
         val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 
