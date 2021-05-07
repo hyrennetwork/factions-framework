@@ -1,13 +1,13 @@
-package com.redefantasy.factions.framework.commands.staff
+package net.hyren.factions.framework.commands.staff
 
-import com.redefantasy.core.shared.CoreConstants
-import com.redefantasy.core.shared.commands.argument.Argument
-import com.redefantasy.core.shared.commands.restriction.CommandRestriction
-import com.redefantasy.core.shared.commands.restriction.entities.implementations.GroupCommandRestrictable
-import com.redefantasy.core.shared.groups.Group
-import com.redefantasy.core.shared.users.data.User
-import com.redefantasy.core.spigot.command.CustomCommand
-import com.redefantasy.core.spigot.misc.utils.ItemBuilder
+import net.hyren.core.shared.CoreConstants
+import net.hyren.core.shared.commands.argument.Argument
+import net.hyren.core.shared.commands.restriction.CommandRestriction
+import net.hyren.core.shared.commands.restriction.entities.implementations.GroupCommandRestrictable
+import net.hyren.core.shared.groups.Group
+import net.hyren.core.shared.users.data.User
+import net.hyren.core.spigot.command.CustomCommand
+import net.hyren.core.spigot.misc.utils.ItemBuilder
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit

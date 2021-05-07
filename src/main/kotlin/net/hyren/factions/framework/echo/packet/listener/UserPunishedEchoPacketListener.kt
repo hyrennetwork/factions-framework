@@ -1,11 +1,12 @@
-package com.redefantasy.factions.framework.echo.packet.listener
+package net.hyren.factions.framework.echo.packet.listener
 
-import com.redefantasy.core.shared.CoreProvider
-import com.redefantasy.core.shared.echo.api.listener.EchoListener
-import com.redefantasy.core.shared.echo.packets.UserPunishedPacket
-import com.redefantasy.factions.framework.FactionsFrameworkConstants
+import net.hyren.core.shared.CoreProvider
+import net.hyren.core.shared.echo.api.listener.EchoListener
+import net.hyren.core.shared.echo.packets.UserPunishedPacket
+import net.hyren.factions.framework.FactionsFrameworkConstants
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
+import java.util.*
 import kotlin.properties.Delegates
 
 /**
@@ -21,7 +22,7 @@ class UserPunishedEchoPacketListener : EchoListener {
 
         val mPlayer = Class.forName("com.massivecraft.factions.entity.MPlayer")
 
-        val _mPlayer = mPlayer.getMethod("get").invoke(userId)
+        val _mPlayer = mPlayer.getMethod("get", UUID::class.java).invoke(mPlayer, userId)
 
         val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 

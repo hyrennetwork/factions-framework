@@ -4,7 +4,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
-group = "com.redefantasy"
+group = "net.hyren"
 version = "0.1-ALPHA"
 
 repositories {
@@ -56,6 +56,6 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:2.8.5")
 
     // core
-    compileOnly("com.redefantasy:core-shared:0.1-ALPHA")
-    compileOnly("com.redefantasy:core-spigot:0.1-ALPHA")
+    compileOnly("net.hyren:core-shared:0.1-ALPHA")
+    compileOnly("net.hyren:core-spigot:0.1-ALPHA")
 }

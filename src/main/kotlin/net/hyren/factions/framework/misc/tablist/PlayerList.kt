@@ -1,8 +1,8 @@
-package com.redefantasy.factions.framework.misc.tablist
+package net.hyren.factions.framework.misc.tablist
 
 import com.mojang.authlib.GameProfile
-import com.redefantasy.core.shared.misc.utils.SequencePrefix
-import com.redefantasy.core.spigot.misc.player.sendPacket
+import net.hyren.core.shared.misc.utils.SequencePrefix
+import net.hyren.core.spigot.misc.player.sendPacket
 import net.minecraft.server.v1_8_R3.ChatComponentText
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo
 import net.minecraft.server.v1_8_R3.WorldSettings

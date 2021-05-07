@@ -1,4 +1,4 @@
-package com.redefantasy.factions.framework
+package net.hyren.factions.framework
 
 /**
  * @author Gutyerrez

@@ -1,15 +1,15 @@
-package com.redefantasy.factions.framework
+package net.hyren.factions.framework
 
-import com.redefantasy.core.shared.CoreProvider
-import com.redefantasy.core.shared.applications.ApplicationType
-import com.redefantasy.core.shared.applications.status.ApplicationStatus
-import com.redefantasy.core.shared.applications.status.task.ApplicationStatusTask
-import com.redefantasy.core.shared.scheduler.AsyncScheduler
-import com.redefantasy.core.spigot.command.registry.CommandRegistry
-import com.redefantasy.core.spigot.misc.plugin.CustomPlugin
-import com.redefantasy.core.spigot.misc.skin.command.SkinCommand
-import com.redefantasy.factions.framework.commands.staff.SerializeItemCommand
-import com.redefantasy.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
+import net.hyren.core.shared.CoreProvider
+import net.hyren.core.shared.applications.ApplicationType
+import net.hyren.core.shared.applications.status.ApplicationStatus
+import net.hyren.core.shared.applications.status.task.ApplicationStatusTask
+import net.hyren.core.shared.scheduler.AsyncScheduler
+import net.hyren.core.spigot.command.registry.CommandRegistry
+import net.hyren.core.spigot.misc.plugin.CustomPlugin
+import net.hyren.core.spigot.misc.skin.command.SkinCommand
+import net.hyren.factions.framework.commands.staff.SerializeItemCommand
+import net.hyren.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
 import java.util.concurrent.TimeUnit
 
