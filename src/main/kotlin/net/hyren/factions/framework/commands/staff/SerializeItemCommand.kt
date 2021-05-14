@@ -1,6 +1,8 @@
 package net.hyren.factions.framework.commands.staff
 
-import net.hyren.core.shared.CoreConstants
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.hyren.core.shared.commands.argument.Argument
 import net.hyren.core.shared.commands.restriction.CommandRestriction
 import net.hyren.core.shared.commands.restriction.entities.implementations.GroupCommandRestrictable
@@ -88,9 +90,7 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 				"test", 1
 			).build()
 
-		val serializedItemStack = CoreConstants.JACKSON.writeValueAsString(itemStack)
-
-		println(serializedItemStack)
+		val serializedItemStack = Json.encodeToString(itemStack)
 
 		commandSender.sendMessage(
 			ComponentBuilder("§7Clique aqui para copiar o item serializado.")
@@ -103,10 +103,7 @@ class SerializeItemCommand : CustomCommand("serialize"), GroupCommandRestrictabl
 				.create()
 		)
 
-		val deserializedItemStack = CoreConstants.JACKSON.readValue(
-			serializedItemStack,
-			ItemStack::class.java
-		)
+		val deserializedItemStack = Json.decodeFromString<ItemStack>(serializedItemStack)
 
 		commandSender.inventory.addItem(deserializedItemStack)
 
