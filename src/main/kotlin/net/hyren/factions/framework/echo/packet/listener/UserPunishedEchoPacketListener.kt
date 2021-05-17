@@ -1,7 +1,7 @@
 package net.hyren.factions.framework.echo.packet.listener
 
 import net.hyren.core.shared.CoreProvider
-import net.hyren.core.shared.echo.api.listener.EchoListener
+import net.hyren.core.shared.echo.api.listener.EchoPacketListener
 import net.hyren.core.shared.echo.packets.UserPunishedPacket
 import net.hyren.factions.framework.FactionsFrameworkConstants
 import org.bukkit.Bukkit
@@ -12,7 +12,7 @@ import kotlin.properties.Delegates
 /**
  * @author Gutyerrez
  */
-class UserPunishedEchoPacketListener : EchoListener {
+class UserPunishedEchoPacketListener : EchoPacketListener {
 
     @Subscribe
     fun on(
