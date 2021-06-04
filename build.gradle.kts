@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.10"
 
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -12,7 +12,9 @@ repositories {
 
     jcenter()
 
-    maven("https://maven.pkg.github.com/hyrendev/nexus/") {
+    maven("http://135.148.58.224:8081/artifactory/releases/") {
+        isAllowInsecureProtocol = true
+
         credentials {
             username = System.getenv("MAVEN_USERNAME")
             password = System.getenv("MAVEN_PASSWORD")
