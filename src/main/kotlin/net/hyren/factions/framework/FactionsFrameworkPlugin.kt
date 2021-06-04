@@ -1,14 +1,12 @@
 package net.hyren.factions.framework
 
 import net.hyren.core.shared.CoreProvider
-import net.hyren.core.shared.applications.ApplicationType
 import net.hyren.core.shared.applications.status.ApplicationStatus
 import net.hyren.core.shared.applications.status.task.ApplicationStatusTask
 import net.hyren.core.shared.scheduler.AsyncScheduler
 import net.hyren.core.spigot.command.registry.CommandRegistry
 import net.hyren.core.spigot.misc.plugin.CustomPlugin
 import net.hyren.core.spigot.misc.skin.command.SkinCommand
-import net.hyren.factions.framework.commands.staff.SerializeItemCommand
 import net.hyren.factions.framework.echo.packet.listener.UserPunishedEchoPacketListener
 import org.bukkit.Bukkit
 import java.util.concurrent.TimeUnit
@@ -38,10 +36,6 @@ class FactionsFrameworkPlugin : CustomPlugin(false) {
          */
 
         CommandRegistry.registerCommand(SkinCommand())
-
-        if (CoreProvider.application.applicationType == ApplicationType.SERVER_TESTS) {
-            CommandRegistry.registerCommand(SerializeItemCommand())
-        }
 
         /**
          * ECHO

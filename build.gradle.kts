@@ -39,6 +39,12 @@ dependencies {
     // paperspigot
     compileOnly("org.github.paperspigot:paperspigot:1.8.8-R0.1-SNAPSHOT")
 
+    // exposed
+    compileOnly("org.jetbrains.exposed:exposed-dao:0.31.1")
+
+    // eventbus
+    compileOnly("org.greenrobot:eventbus:3.2.0")
+
     // core
     compileOnly("net.hyren:core-shared:0.1-ALPHA")
     compileOnly("net.hyren:core-spigot:0.1-ALPHA")
