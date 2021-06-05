@@ -24,7 +24,7 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
             val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 
             if (_mPlayer !== null && punishment.punishCategory?.name?.value == CoreProvider.Cache.Local.PUNISH_CATEGORIES.provide().fetchByName("USO_DE_HACK")?.name?.value) {
-                val faction = mPlayer::class.java.getMethod("getFaction").invoke(_mPlayer) ?: return
+                val faction = mPlayer.getMethod("getFaction").invoke(_mPlayer) ?: return
                 val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
                 val factionTag = faction::class.java.getMethod("getTag").invoke(faction) as String
                 val factionName = faction::class.java.getMethod("getName").invoke(faction) as String
@@ -41,12 +41,15 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                     "withdrawPlayer", String::class.java, Double::class.java
                 )
                 val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
+
                 /**
                  * Outdated
                  */
+
                 Bukkit.broadcastMessage(
-                    "\n" + "§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna." + "\n\n"
+                    "\n§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.\n\n"
                 )
+
                 var total = 0.0
 
                 mPlayers.forEach {
