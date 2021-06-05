@@ -50,7 +50,7 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                 Bukkit.getOnlinePlayers().forEach {
                     it.sendMessage(
                         ComponentBuilder("\n")
-                            .append("§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
+                            .append("§7$name §cfoi punido por programas ilegais e como multa, sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
                             .append("\n\n")
                             .create()
                     )
@@ -66,8 +66,12 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                     withdrawPlayer.invoke(
                         registeredServiceProvider, name, if ((oldBalance - 25.0 * oldBalance / 100.0) <= 0.0) {
                             newBalance = oldBalance
+
+                            newBalance
                         } else {
                             newBalance = oldBalance % (oldBalance - (25.0 * oldBalance / 100.0))
+
+                            newBalance
                         }
                     )
 
