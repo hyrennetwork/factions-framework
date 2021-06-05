@@ -4,6 +4,7 @@ import net.hyren.core.shared.CoreProvider
 import net.hyren.core.shared.echo.api.listener.EchoPacketListener
 import net.hyren.core.shared.echo.packets.UserPunishedPacket
 import net.hyren.factions.framework.FactionsFrameworkConstants
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit
 import org.greenrobot.eventbus.Subscribe
 import kotlin.properties.Delegates
@@ -19,12 +20,12 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
     ) {
         try {
             val userId = packet.userId
-            val mPlayer = Class.forName("com.massivecraft.factions.entity.MPlayer")
-            val _mPlayer = mPlayer.getMethod("get", Any::class.java).invoke(mPlayer, userId)
+            val MPlayer = Class.forName("com.massivecraft.factions.entity.MPlayer")
+            val _mPlayer = MPlayer.getMethod("get", Any::class.java).invoke(MPlayer, userId)
             val punishment = CoreProvider.Cache.Local.USERS_PUNISHMENTS.provide().fetchById(packet.id!!) ?: return
 
             if (_mPlayer !== null && punishment.punishCategory?.name?.value == CoreProvider.Cache.Local.PUNISH_CATEGORIES.provide().fetchByName("USO_DE_HACK")?.name?.value) {
-                val faction = mPlayer.getMethod("getFaction").invoke(_mPlayer) ?: return
+                val faction = MPlayer.getMethod("getFaction").invoke(_mPlayer) ?: return
                 val factionId = faction::class.java.superclass.superclass.getMethod("getId").invoke(faction) as String? ?: return
                 val factionTag = faction::class.java.getMethod("getTag").invoke(faction) as String
                 val factionName = faction::class.java.getMethod("getName").invoke(faction) as String
@@ -40,32 +41,34 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                 val withdrawPlayer = registeredServiceProvider::class.java.getDeclaredMethod(
                     "withdrawPlayer", String::class.java, Double::class.java
                 )
-                val name = mPlayer.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
+                val name = MPlayer.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
 
                 /**
                  * Outdated
                  */
 
-                Bukkit.broadcastMessage(
-                    "\n§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.\n\n"
-                )
+                Bukkit.getOnlinePlayers().forEach {
+                    it.sendMessage(
+                        ComponentBuilder()
+                            .append("\n")
+                            .append("§7$name §cfoi punido por programas ilegais e como multa sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
+                            .append("\n\n")
+                            .create()
+                    )
+                }
 
                 var total = 0.0
 
                 mPlayers.forEach {
-                    val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(it) as String
-                    var oldBalance = getBalance.invoke(registeredServiceProvider, name) as Double
+                    val name = MPlayer.superclass.getDeclaredMethod("getName").invoke(it) as String
+                    val oldBalance = getBalance.invoke(registeredServiceProvider, name) as Double
                     var newBalance by Delegates.notNull<Double>()
 
                     withdrawPlayer.invoke(
                         registeredServiceProvider, name, if ((oldBalance - 25.0 * oldBalance / 100.0) <= 0.0) {
                             newBalance = oldBalance
-
-                            newBalance
                         } else {
                             newBalance = oldBalance % (oldBalance - (25.0 * oldBalance / 100.0))
-
-                            newBalance
                         }
                     )
 
@@ -90,7 +93,7 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                     }
                 }
 
-                println("Total perdido: $total")
+                println("Balanço total perdido: $total")
             }
         } catch (e: Exception) {
             e.printStackTrace()
