@@ -40,7 +40,7 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                 val withdrawPlayer = registeredServiceProvider::class.java.getDeclaredMethod(
                     "withdrawPlayer", String::class.java, Double::class.java
                 )
-                val name = mPlayer::class.java.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
+                val name = mPlayer.superclass.getDeclaredMethod("getName").invoke(_mPlayer) as String
 
                 /**
                  * Outdated
