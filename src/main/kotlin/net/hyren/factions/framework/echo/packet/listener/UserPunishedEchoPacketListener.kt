@@ -50,8 +50,8 @@ class UserPunishedEchoPacketListener : EchoPacketListener {
                 Bukkit.getOnlinePlayers().forEach {
                     it.sendMessage(
                         ComponentBuilder("\n")
-                            .append("§7$name §cfoi punido por programas ilegais e como multa, sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
-                            .append("\n\n")
+                            .appendLegacy("§7$name §cfoi punido por programas ilegais e como multa, sua facção §f[$factionTag] $factionName §cperdeu §f25% §cde sua fortuna.")
+                            .append("\n")
                             .create()
                     )
                 }
